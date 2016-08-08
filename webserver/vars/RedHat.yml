@@ -1,1 +1,16 @@
-
+apache_conf_dir: /etc/httpd/conf.d
+apache_module_dir: /etc/httpd/conf.modules.d
+vhosts_filename: vhosts.conf
+apache_user: apache
+apache_group: apache
+apache_listen_port: 80
+apache_listen_https_port: 443
+apache_conf_file: "{{apache_conf_dir}}/01_secure.conf"
+php_conf_file: "/etc/php.ini"
+apache_remove_files:
+    - path: "{{apache_conf_dir}}/welcome.conf"
+    - path: "{{apache_conf_dir}}/userdir.conf"
+    - path: "{{apache_conf_dir}}/autoindex.conf"
+postfix_conf_dir: /etc/postfix/
+postfix_user: postfix
+postfix_group: postfix

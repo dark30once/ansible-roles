@@ -1,6 +1,9 @@
 ---
 # Tasks to install apache httpd and php
 
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+
 - name: Include OS-specific taks
   include: "{{ ansible_os_family }}.yml"
 
