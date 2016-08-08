@@ -1,0 +1,37 @@
+{# Set up VirtualHosts #}
+
+DirectoryIndex index.html index.php
+
+{% for vhost in apache_vhosts %}
+<VirtualHost *:{{ apache_listen_port }}>
+  ServerName {{ vhost.servername }}
+  RewriteEngine On
+{% if vhost.serveralias is defined %}
+  ServerAlias {{ vhost.serveralias }}
+{% endif %}
+{% if vhost.documentroot is defined %}
+  DocumentRoot {{ vhost.documentroot }}
+{% endif %}
+
+  ServerAdmin dolfandringa@gmail.com
+{% if vhost.documentroot is defined %}
+  <Directory "{{ vhost.documentroot }}/">
+    {% if vhost.redirect is defined %}
+        RewriteRule ^(.*)$ {{ vhost.redirect }} [L,R=301]
+    {% endif %}
+    AllowOverride All
+    Options -Indexes +FollowSymLinks
+    Require all granted
+  </Directory>
+  {% if vhost.welcome is defined %}
+  <LocationMatch "^/$">
+    ErrorDocument 403 /noindex/index.html
+  </LocationMatch>
+  {% endif %}
+{% endif %}
+{% if vhost.extra_parameters is defined %}
+  {{ vhost.extra_parameters }}
+{% endif %}
+</VirtualHost>
+
+{% endfor %}

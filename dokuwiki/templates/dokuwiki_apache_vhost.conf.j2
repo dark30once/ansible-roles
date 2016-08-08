@@ -1,0 +1,59 @@
+{# Set up VirtualHosts #}
+
+DirectoryIndex index.php
+
+{% if dokuwiki_use_https is defined and dokuwiki_use_https %}
+<VirtualHost *:{{ apache_listen_https_port }}>
+{% else %}
+<VirtualHost *:{{ apache_listen_port }}>
+{% endif %}
+  ServerName {{ dokuwiki_servername }}
+  DocumentRoot {{ dokuwiki_path }}/
+  ServerAdmin {{ dokuwiki_mail_from_address }}
+  RewriteEngine on
+  {% if dokuwiki_use_https is defined and dokuwiki_use_https %}
+    SSLEngine On
+    SSLProtocol all -SSLv2 -SSLv3
+    SSLHonorCipherOrder on
+    SSLCipherSuite "EECDH+ECDSA+AESGCM EECDH+aRSA+AESGCM EECDH+ECDSA+SHA384 EECDH+ECDSA+SHA256 EECDH+aRSA+SHA384 EECDH+aRSA+SHA256 EECDH EDH+aRSA !aNULL !eNULL !LOW !MEDIUM !3DES !MD5 !EXP !PSK !SRP !DSS !RC4"
+    SSLCertificateFile /etc/letsencrypt/live/{{ dokuwiki_servername }}/cert.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/{{ dokuwiki_servername }}/privkey.pem
+    SSLCertificateChainFile /etc/letsencrypt/live/{{ dokuwiki_servername }}/chain.pem
+  {% endif %}
+  <Directory "{{ dokuwiki_path }}/">
+    AllowOverride All
+    Options -Indexes +FollowSymLinks
+    Require all granted
+    RewriteRule ^_media/(.*)              lib/exe/fetch.php?media=$1  [QSA,L]
+    RewriteRule ^_detail/(.*)             lib/exe/detail.php?media=$1  [QSA,L]
+    RewriteRule ^_export/([^/]+)/(.*)     doku.php?do=export_$1&id=$2  [QSA,L]
+    RewriteRule ^$                        doku.php  [L]
+    RewriteCond %{REQUEST_FILENAME}       !-f
+    RewriteCond %{REQUEST_FILENAME}       !-d
+    RewriteRule (.*)                      doku.php?id=$1  [QSA,L]
+    RewriteRule ^index.php$               doku.php
+  </Directory>
+  <Location /install.php>
+#BEGIN dokuwiki_install ANSIBLE MANAGED BLOCK!
+    Require all denied
+#END dokuwiki_install ANSIBLE MANAGED BLOCK!
+  </Location>
+  <LocationMatch "/(data|conf|bin|inc)/">
+    Require all denied
+  </LocationMatch>
+</VirtualHost>
+
+{% if dokuwiki_use_https is defined and dokuwiki_use_https %}
+<VirtualHost *:{{ apache_listen_port }}>
+  ServerName {{ dokuwiki_servername }}
+  DocumentRoot {{ dokuwiki_path }}/
+  ServerAdmin {{ dokuwiki_mail_from_address }}
+  RewriteEngine on
+  <Directory "{{ dokuwiki_path }}/">
+    AllowOverride All
+    Options -Indexes +FollowSymLinks
+    Require all granted
+    RewriteRule ^(.*)$  https://{{ dokuwiki_servername }}/$1  [R=301,L]
+  </Directory>
+</VirtualHost>
+{% endif %}

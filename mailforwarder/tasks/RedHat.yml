@@ -1,0 +1,9 @@
+---
+# RedHat/CentOS specific tasks
+
+- name: Install postfix
+  yum: name={{ item }} state=present
+  with_items:
+      - postfix
+
+

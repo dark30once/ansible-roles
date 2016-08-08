@@ -1,0 +1,89 @@
+---
+# Dokuwiki installation
+
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Setup Docuwiki path
+  file: path={{ vhost_path }} owner={{ apache_user }} group={{ apache_group }} mode=755 state=directory
+
+- debug: msg='vhost_path {{ vhost_path }}'
+
+- name: Include OS-specific taks
+  include: "{{ ansible_os_family }}.yml"
+
+- name: Download and extract latest Dokuwiki stable
+  unarchive:
+      copy: no
+      src: "http://download.dokuwiki.org/src/dokuwiki/dokuwiki-stable.tgz"
+      dest: "{{ vhost_path }}"
+      list_files: True
+  register: tar_files  
+
+- name: set new_dokuwiki_version
+  shell: grep -o "^[0-9\-]\+" "{{ vhost_path }}/{{ tar_files['files'][0] }}/VERSION"
+  register: new_dokuwiki_version
+  when: tar_files.files is defined
+
+- name: set old_dokuwiki_version
+  shell: grep -o "^[0-9\-]\+" "{{ dokuwiki_path }}/VERSION"
+  register: old_dokuwiki_version
+
+- debug: msg='old version {{ old_dokuwiki_version.stdout }} new version {{ new_dokuwiki_version.stdout }}'
+  when: new_dokuwiki_version.stdout is defined
+
+- name: update dokuwiki
+  synchronize: src="{{ tar_files['files'][0] }}/" dest="{{ dokuwiki_path }}/"
+  when: new_dokuwiki_version.stdout is defined and new_dokuwiki_version.stdout>old_dokuwiki_version.stdout
+
+- debug: msg='dokuwiki already up-to-date'
+  when: new_dokuwiki_version.stdout is defined and new_dokuwiki_version.stdout<=old_dokuwiki_version.stdout
+
+- name: remove downloaded dokuwiki
+  file: path="{{ vhost_path }}/{{ tar_files['files'][0] }}" state=absent
+  when: tar_files.files is defined
+
+- name: stop apache
+  service:
+      name: httpd
+      state: stopped
+
+- name: setup lets encrypt SSL
+  shell: certbot certonly --keep -n --standalone -m waterspace@foundationu.com -d nightowl.foundationu.com --agree-tos
+  when: dokuwiki_use_https is defined and dokuwiki_use_https
+
+- name: start apache
+  service:
+      name: httpd
+      state: started
+
+- name: Apache Dokuwiki Config
+  template:
+    src: dokuwiki_apache_vhost.conf.j2
+    dest: "{{ apache_conf_dir }}/dokuwiki.conf"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Fix permissions
+  shell: chown -R {{ apache_user }}:{{ apache_group }} {{ vhost_path }}/*
+  notify: restart apache
+
+- name: Setup email config
+  lineinfile: dest="{{ dokuwiki_path }}/conf/dokuwiki.php" regexp="\$conf\['mailfrom'\]" line="$conf['mailfrom'] = '{{ dokuwiki_mail_from_address }}';" state=present
+
+- name: Deny access to install.php
+  blockinfile:
+    dest: "{{ apache_conf_dir }}/dokuwiki.conf"
+    content: "    Require all denied"
+    marker: "#{mark} dokuwiki_install ANSIBLE MANAGED BLOCK!"
+  when: not dokuwiki_install
+  notify: restart apache
+
+- name: Grant access to install.php
+  blockinfile:
+    dest: "{{ apache_conf_dir }}/dokuwiki.conf"
+    content: "    Require all granted"
+    marker: "#{mark} dokuwiki_install ANSIBLE MANAGED BLOCK!"
+  when: dokuwiki_install
+  notify: restart apache

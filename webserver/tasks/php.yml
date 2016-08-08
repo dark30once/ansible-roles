@@ -1,0 +1,21 @@
+---
+
+- name: Tighten down php config
+  ini_file: dest={{ php_conf_file }} option={{ item.key }} value={{ item.value }} section={{ item.section }} state=present
+  with_items:
+      - key: "expose_php"
+        value: "Off"
+        section: "PHP"
+      - key: 'allow_url_fopen'
+        value: 'Off'
+        section: 'PHP'
+      - key: 'allow_url_include'
+        value: 'Off'
+        section: 'PHP'
+      - key: "display_errors"
+        value: "Off"
+        section: 'PHP'
+      - key: 'error_log'
+        value: '/var/log/httpd/php.log'
+        section: 'PHP'
+  notify: restart apache

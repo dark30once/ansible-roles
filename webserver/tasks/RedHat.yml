@@ -1,0 +1,30 @@
+---
+# RedHat/CentOS specific tasks
+
+- name: Install apache and php
+  yum: name={{ item }} state=present
+  with_items:
+      - httpd
+      - php
+      - php-gd
+      - mod_security
+      - mod_ssl
+      - epel-release
+      - certbot
+
+- name: Create config files if not existing
+  copy: 
+      dest: '{{ item }}'
+      owner: 'root'
+      group: 'root'
+      mode: 640 
+      force: no
+      content: ""
+  with_items:
+      - '{{ apache_conf_file }}'
+
+- name: Disable apache modules on RedHat/CentOS
+  file: path={{apache_module_dir}}/{{ item.path }} state=absent
+  with_items:
+      - path: 00-proxy.conf
+      - path: 01-cgi.conf

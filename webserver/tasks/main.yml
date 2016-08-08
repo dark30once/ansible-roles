@@ -1,0 +1,71 @@
+---
+# Tasks to install apache httpd and php
+
+- name: Include OS-specific taks
+  include: "{{ ansible_os_family }}.yml"
+
+- name: http service state
+  service: name=httpd state=started enabled=yes
+  when: not skip_httpd_restart
+
+- name: setup fs
+  file: path={{ item.path }} owner='root' group='root' mode=755 state=directory
+  with_items:
+      - path: /srv
+      - path: /srv/www
+      - path: /srv/www/vhosts
+
+- name: set SELinux fcontext
+  shell: semanage fcontext -t {{ item.type }} -a "{{ item.target }}(/.*)?"
+  with_items:
+      - target: '/srv/www'
+        type: httpd_sys_rw_content_t
+  when: selinux_host is defined and selinux_host
+
+- name: set SELinux fcontext part2
+  shell: restorecon -R "{{ item.target }}"
+  with_items:
+      - target: '/srv/www'
+  when: selinux_host is defined and selinux_host
+
+- name: set SELinux httpd_can_sendmail
+  shell: setsebool -P httpd_can_sendmail on
+  when: selinux_host is defined and selinux_host
+
+- name: Tighten down apache security
+  lineinfile: dest="{{ apache_conf_file }}" regexp="{{ item.regexp }}" line="{{ item.line }}" state=present
+  with_items: 
+    - regexp: "^ServerTokens"
+      line: "ServerTokens Prod"
+    - regexp: "^ServerSignature"
+      line: "ServerSignature Off"
+  notify: restart apache
+
+- name: setup docroots
+  file: path={{ item.documentroot }} owner='{{apache_user}}' group='{{apache_group}}' mode=755 state=directory
+  with_items: '{{apache_vhosts}}'
+
+- name: copy noindex
+  copy: src=files/noindex dest={{ item.documentroot }}/ owner='{{apache_user}}' group='{{apache_group}}' mode=755
+  with_items: '{{apache_vhosts}}'
+  when: item.welcome is defined
+
+- name: remove defaultconf
+  file: path={{ item.path }} state=absent
+  with_items: '{{apache_remove_files}}'
+
+- name: setup vhosts
+  template:
+      src: "vhosts.conf.j2"
+      dest: "{{ apache_conf_dir }}/{{ vhosts_filename }}"
+      owner: root
+      group: root
+      mode: 0644
+  notify: restart apache
+
+- name: Include PHP tasks
+  include: "php.yml"
+
+- name: Include postfix tasks
+  include: "postfix.yml"
+

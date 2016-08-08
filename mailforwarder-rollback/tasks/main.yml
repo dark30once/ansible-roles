@@ -1,0 +1,48 @@
+---
+# Tasks to install postfix mailforwarder
+
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- stat: path="{{ postfix_conf_dir }}/main.cf"
+  register: postfix_conf_stat
+
+- name: set postfix main.cf options
+  lineinfile: dest="{{ postfix_conf_dir }}/main.cf" regexp="{{ item.regexp }}" line="{{ item.line }}" state=present
+  with_items:
+      - regexp: "^relayhost =" 
+        line: "#relayhost = {{ postfix_relay_host }}"
+      - regexp: "^virtual_alias_domains"
+        line: "#virtual_alias_domains = {{ postfix_virtual_domains }}"
+      - regexp: "^virtual_alias_maps"
+        line: "#virtual_alias_maps = hash:{{ postfix_conf_dir }}virtual"
+  when: postfix_conf_stat.stat.exists
+
+- name: remove virtual emails
+  file: dest="{{ postfix_conf_dir }}/{{ item }}" state=absent
+  with_items:
+      - virtual
+      - virtual.db
+
+- name: remove iptables rules
+  iptables: 
+      chain: IN_public_allow
+      destination: 0.0.0.0/0
+      ctstate: NEW
+      protocol: tcp
+      destination_port: "{{ item }}"
+      source: 0.0.0.0/0
+      jump: ACCEPT
+      state: absent
+  with_items:
+      - 25
+      - 465
+
+- name: service state
+  service: name={{ item }} state=stopped enabled=no
+  ignore_errors: yes
+  with_items:
+      - postfix
+
+- name: Include OS-specific tasks
+  include: "{{ ansible_os_family }}.yml"

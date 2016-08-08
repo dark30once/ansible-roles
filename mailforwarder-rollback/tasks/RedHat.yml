@@ -1,0 +1,9 @@
+---
+# RedHat/CentOS specific tasks
+
+- name: Un-install postfix
+  yum: name={{ item }} state=absent
+  with_items:
+      - postfix
+
+

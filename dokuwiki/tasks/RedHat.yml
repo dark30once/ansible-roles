@@ -1,0 +1,9 @@
+---
+# RedHat/CentOS specific tasks
+
+- name: Install php modules
+  yum: name={{ item }} state=present
+  with_items:
+      - php-pdo
+      - sqlite
+  notify: restart apache
