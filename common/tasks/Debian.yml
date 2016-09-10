@@ -1,0 +1,4 @@
+---
+
+- name: Install Debian updates (aptitude safe upgrade)
+  apt: upgrade=safe update_cache=yes

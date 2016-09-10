@@ -1,22 +1,7 @@
 ---
 
-- name: setup_yum_repos
-  yum_repository: name={{item.name}} description={{item.description}} baseurl={{item.url}}
-  with_items:
-      - name: foundationu
-        description: Foundation University mirro
-        url: http://mirror.itops.foundationu.com/centos/7/os/x86_64/
-      - name: epel
-        description: EPEL YUM repo
-        url: http://dl.fedoraproject.org/pub/epel/7/x86_64/
-  when: ansible_os_family == 'RedHat'
-
-- name: install selinux software
-  yum: name={{ item }} state=present
-  with_items:
-      - setroubleshoot-server
-      - policycoreutils-python
-  when: ansible_os_family == 'RedHat' and selinux_host is defined and selinux_host
+- name: Include OS-specific taks
+  include: "{{ ansible_os_family }}.yml"
 
 - name: ssh disable password auth
   lineinfile: dest=/etc/ssh/sshd_config regexp="^PasswordAuthentication" line="PasswordAuthentication no" state=present

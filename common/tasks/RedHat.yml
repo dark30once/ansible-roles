@@ -1,0 +1,18 @@
+---
+
+- name: setup_yum_repos
+  yum_repository: name={{item.name}} description={{item.description}} baseurl={{item.url}}
+  with_items:
+      - name: foundationu
+        description: Foundation University mirro
+        url: http://mirror.itops.foundationu.com/centos/7/os/x86_64/
+      - name: epel
+        description: EPEL YUM repo
+        url: http://dl.fedoraproject.org/pub/epel/7/x86_64/
+
+- name: install selinux software
+  yum: name={{ item }} state=present
+  with_items:
+      - setroubleshoot-server
+      - policycoreutils-python
+  when: selinux_host is defined and selinux_host

@@ -1,0 +1,20 @@
+---
+
+- name: Include generic variables
+  include_vars: "defaults.yml"
+
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Include OS-specific tasks
+  include: "{{ ansible_os_family }}.yml"
+
+- name: Install python packages
+  pip: name={{ item }} state=present executable=pip3
+  with_items:
+      - Flask
+      - alembic
+      - Flask-ini
+      - Flask-migrate
+      - Flask-SQLAlchemy
+      - Flask-script

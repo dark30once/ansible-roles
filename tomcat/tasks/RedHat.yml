@@ -1,0 +1,10 @@
+---
+# RedHat/CentOS specific tasks
+
+- name: Install tomcat
+  yum: name={{ item }} state=present
+  with_items:
+      - epel-release
+      - tomcat
+
+
