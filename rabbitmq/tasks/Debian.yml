@@ -1,0 +1,11 @@
+
+- name: Add RabbitMQ repository
+  apt_repository: repo='deb http://www.rabbitmq.com/debian/ testing main' state='present' 
+
+- name: Add RabbitMQ apt key
+  apt_key: url='https://www.rabbitmq.com/rabbitmq-release-signing-key.asc' state='present'
+
+- name: Install required debian packages
+  apt: name={{ item }} state=present update_cache=yes
+  with_items: "{{ packages }}"
+

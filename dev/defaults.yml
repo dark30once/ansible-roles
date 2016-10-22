@@ -1,0 +1,6 @@
+packages:
+    - vim
+    - git
+    - ctags
+    - python3-flake8
+    - exuberant-ctags

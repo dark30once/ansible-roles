@@ -9,6 +9,12 @@
 - name: Include OS-specific tasks
   include: "{{ ansible_os_family }}.yml"
 
+- name: Remove existing ODK Aggregate
+  file: path="{{ tomcat_webapp_dir }}/ODKAggregate/" state=absent 
+
+- name: Remove existing ODK Aggregate war
+  file: path="{{ tomcat_webapp_dir }}/ODKAggregate.war" state=absent 
+
 - name: copy ODK-aggregate war
   copy: src=ODKAggregate.war dest="{{ tomcat_webapp_dir }}"
   notify: restart tomcat
