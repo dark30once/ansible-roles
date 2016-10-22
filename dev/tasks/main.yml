@@ -23,3 +23,18 @@
       - 
         src: home/.vimrc
         dest: ~vagrant/
+
+- name: Set vim as default editor
+  lineinfile: line='export EDITOR=vim' dest='~vagrant/.bashrc' state='present' owner=vagrant group=vagrant
+
+- name: Set global git config params
+  ini_file: dest='~vagrant/.gitconfig' section='{{ item.section }}' option='{{ item.option }}' value='{{ item.value }}' state='present' owner=vagrant group=vagrant
+  with_items:
+      -
+        section: user
+        option: email
+        value: dolfandringa@gmail.com
+      -
+        section: user
+        option: name
+        value: Dolf Andringa
