@@ -7,9 +7,9 @@ set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
 
 let g:syntastic_javascript_checkers = ['jshint']
-let g:syntastic_python_python_exec = '/usr/sbin/python2'
-let g:syntastic_python_flake8_exec = 'flake8-python2'
-let g:syntastic_python_checkers = ['flake8']
+let g:syntastic_python_python_exec = 'python3'
+let g:syntastic_python_pyflakes_exec = 'pyflakes3'
+let g:syntastic_python_checkers = ['pyflakes']
 let g:syntastic_check_on_open = 1
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1

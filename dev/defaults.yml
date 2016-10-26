@@ -4,3 +4,5 @@ packages:
     - ctags
     - python3-flake8
     - exuberant-ctags
+    - ngrok-client
+    - ngrok-server

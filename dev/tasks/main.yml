@@ -38,3 +38,7 @@
         section: user
         option: name
         value: Dolf Andringa
+      -
+        section: push
+        option: default
+        value: simple
