@@ -31,6 +31,7 @@
       destination_port: "{{ item }}"
       source: 0.0.0.0/0
       jump: ACCEPT
+      state: absent
   with_items:
       - 25
       - 465
