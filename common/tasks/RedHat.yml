@@ -19,3 +19,4 @@
  
 - name: update all software
   yum: name=* update_cache=yes state=latest
+
