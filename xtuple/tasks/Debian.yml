@@ -1,0 +1,11 @@
+---
+# Debian/Ubuntu specific tasks
+
+- name: Install required debian packages
+  apt: name={{ item }} state=present update_cache=yes
+  with_items:
+      - postgresql
+      - postgresql-contrib
+      - postgresql-{{postgresql_version}}-plv8
+      - libpq-dev
+      - python-psycopg2
