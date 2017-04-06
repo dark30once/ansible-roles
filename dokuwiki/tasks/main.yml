@@ -7,6 +7,9 @@
 - name: Setup Docuwiki path
   file: path={{ vhost_path }} owner={{ apache_user }} group={{ apache_group }} mode=755 state=directory
 
+- name: Setup static path
+  file: path={{ vhost_path }}/static owner={{ apache_user }} group={{ apache_group }} mode=755 state=directory
+
 - debug: msg='vhost_path {{ vhost_path }}'
 
 - name: Include OS-specific taks
@@ -32,8 +35,11 @@
 - debug: msg='old version {{ old_dokuwiki_version.stdout }} new version {{ new_dokuwiki_version.stdout }}'
   when: new_dokuwiki_version.stdout is defined
 
+- debug: msg="Rsyncing {{ vhost_path }}{{ tar_files['files'][0] }}* to {{ dokuwiki_path }}/"
+  when: new_dokuwiki_version.stdout is defined
+
 - name: update dokuwiki
-  synchronize: src="{{ tar_files['files'][0] }}/" dest="{{ dokuwiki_path }}/"
+  shell: rsync -ra "{{ vhost_path }}{{ tar_files['files'][0] }}" "{{ dokuwiki_path }}/"
   when: new_dokuwiki_version.stdout is defined and new_dokuwiki_version.stdout>old_dokuwiki_version.stdout
 
 - debug: msg='dokuwiki already up-to-date'

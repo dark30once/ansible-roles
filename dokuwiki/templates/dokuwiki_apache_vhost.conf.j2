@@ -20,6 +20,12 @@ DirectoryIndex index.php
     SSLCertificateKeyFile /etc/letsencrypt/live/{{ dokuwiki_servername }}/privkey.pem
     SSLCertificateChainFile /etc/letsencrypt/live/{{ dokuwiki_servername }}/chain.pem
   {% endif %}
+  Alias "/static" "{{ vhost_path }}/static"
+  <Directory "{{ vhost_path }}/static">
+    AllowOverride None
+    Options -Indexes -FollowSymLinks
+    Require all granted
+  </Directory>
   <Directory "{{ dokuwiki_path }}/">
     AllowOverride All
     Options -Indexes +FollowSymLinks
@@ -54,6 +60,11 @@ DirectoryIndex index.php
     Options -Indexes +FollowSymLinks
     Require all granted
     RewriteRule ^(.*)$  https://{{ dokuwiki_servername }}/$1  [R=301,L]
+  </Directory>
+  Alias "/static" "{{ vhost_path }}/static"
+  <Directory "{{ vhost_path }}/static">
+    AllowOverride None
+    Options -Indexes -FollowSymLinks
   </Directory>
 </VirtualHost>
 {% endif %}

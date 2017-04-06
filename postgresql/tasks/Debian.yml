@@ -1,7 +1,8 @@
 ---
-# Debian/Ubuntu specific tasks
+# Debian specific tasks
 
 - name: Install required debian packages
   apt: name={{ item }} state=present update_cache=yes
   with_items:
       - postgresql
+      - postgresql-contrib
