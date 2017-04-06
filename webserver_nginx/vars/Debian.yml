@@ -1,0 +1,10 @@
+nginx_conf_dir: /etc/nginx/conf.d
+nginx_user: www-data
+nginx_group: www-data
+nginx_listen_port: 80
+nginx_listen_https_port: 443
+nginx_conf_file: "{{nginx_conf_dir}}/01_secure.conf"
+php_conf_file: "/etc/php.ini"
+postfix_conf_dir: /etc/postfix/
+postfix_user: postfix
+postfix_group: postfix

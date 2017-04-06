@@ -1,0 +1,50 @@
+---
+# Tasks to install nginx httpd and php
+
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Include OS-specific taks
+  include: "{{ ansible_os_family }}.yml"
+
+- name: nginx service state
+  service: name=nginx state=started enabled=yes
+  when: not skip_httpd_restart
+
+- name: setup fs
+  file: path={{ item.path }} owner='root' group='root' mode=755 state=directory
+  with_items:
+      - path: /srv
+      - path: /srv/www
+      - path: /srv/www/vhosts
+
+- name: set SELinux fcontext
+  shell: semanage fcontext -t {{ item.type }} -a "{{ item.target }}(/.*)?"
+  with_items:
+      - target: '/srv/www'
+        type: httpd_sys_rw_content_t
+  when: selinux_host is defined and selinux_host
+
+- name: set SELinux fcontext part2
+  shell: restorecon -R "{{ item.target }}"
+  with_items:
+      - target: '/srv/www'
+  when: selinux_host is defined and selinux_host
+
+- name: set SELinux httpd_can_sendmail
+  shell: setsebool -P httpd_can_sendmail on
+  when: selinux_host is defined and selinux_host
+
+- name: Tighten down nginx security
+  lineinfile: dest="{{ nginx_conf_file }}" regexp="{{ item.regexp }}" line="{{ item.line }}" state=present
+  with_items: 
+    - regexp: "^server_tokens*"
+      line: "server_tokens off;"
+  notify: restart nginx
+
+- name: Include PHP tasks
+  include: "php.yml"
+
+- name: Include postfix tasks
+  include: "postfix.yml"
+
