@@ -1,14 +1,16 @@
 ---
 
 - name: setup_yum_repos
-  yum_repository: name={{item.name}} description={{item.description}} baseurl={{item.url}}
+  yum_repository: name={{item.name}} description={{item.description}} baseurl={{item.url}} state={{item.state}}
   with_items:
       - name: foundationu
         description: Foundation University mirro
         url: http://mirror.itops.foundationu.com/centos/7/os/x86_64/
+        state: absent
       - name: epel
         description: EPEL YUM repo
         url: http://dl.fedoraproject.org/pub/epel/7/x86_64/
+        state: present
 
 - name: install selinux software
   yum: name={{ item }} state=present
