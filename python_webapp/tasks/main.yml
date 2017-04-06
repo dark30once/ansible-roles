@@ -1,0 +1,19 @@
+---
+# Tasks to install python gunicorn and circus
+#
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Include OS-specific taks
+  include: "{{ ansible_os_family }}.yml"
+
+- name: Intall python packages
+  pip: executable=pip3 name={{ item }} state=present
+  with-items:
+      - virtualenv
+      - circus
+      - gunicorn
+      - psycopg2
+      - configobj
+      - mysqlclient
+      - py-bcrypt

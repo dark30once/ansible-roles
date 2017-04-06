@@ -1,0 +1,10 @@
+---
+# RedHat/Centos specific tasks
+
+- name: Install required debian packages
+  yum: name={{ item }} state=present update_cache=yes
+  with_items:
+      - python34
+      - python34-pip
+      - python34-devel
+      - postgresql-devel
