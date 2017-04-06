@@ -16,7 +16,6 @@
       - setroubleshoot-server
       - policycoreutils-python
   when: selinux_host is defined and selinux_host
- 
-- name: update all software
-  yum: name=* update_cache=yes state=latest
 
+- name: upgrade all packages
+  yum: name=* state=latest update_cache=yes
