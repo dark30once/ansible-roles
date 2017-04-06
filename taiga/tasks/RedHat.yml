@@ -1,0 +1,8 @@
+---
+# RedHat/Centos specific tasks
+
+- name: Install required debian packages
+  yum: name={{ item }} state=present update_cache=yes
+  with_items:
+      - https://www.rabbitmq.com/releases/rabbitmq-server/v3.6.9/rabbitmq-server-3.6.9-1.el7.noarch.rpm
+      - redis
