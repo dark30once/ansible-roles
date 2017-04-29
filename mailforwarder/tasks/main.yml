@@ -22,9 +22,9 @@
       - regexp: "^virtual_alias_maps"
   notify: restart postfix
 
-- name: setup iptables
+- name: iptables public input absent
   iptables: 
-      chain: IN_public_allow
+      chain: "{{ iptables_input_chain }}"
       destination: 0.0.0.0/0
       ctstate: NEW
       protocol: tcp
@@ -32,6 +32,36 @@
       source: 0.0.0.0/0
       jump: ACCEPT
       state: absent
+  with_items:
+      - 25
+      - 465
+
+- name: iptables local input allow
+  iptables: 
+      chain: "{{ iptables_input_chain }}"
+      destination: 127.0.0.1/8
+      ctstate: NEW
+      protocol: tcp
+      in_interface: lo
+      destination_port: "{{ item }}"
+      source: 127.0.0.1/8
+      jump: ACCEPT
+      state: present
+  with_items:
+      - 25
+      - 465
+
+- name: iptables public input drop
+  iptables: 
+      chain: "{{ iptables_input_chain }}"
+      destination: 0.0.0.0/0
+      ctstate: NEW
+      protocol: tcp
+      in_interface: "{{ public_eth }}"
+      destination_port: "{{ item }}"
+      source: 0.0.0.0/0
+      jump: DROP
+      state: present
   with_items:
       - 25
       - 465

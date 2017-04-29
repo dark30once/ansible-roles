@@ -1,0 +1,3 @@
+python_run_circus: true
+python_run_gunicorn: true
+python_run_supervisor: false

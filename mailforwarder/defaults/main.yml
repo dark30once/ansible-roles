@@ -1,0 +1,5 @@
+postfix_conf_dir: /etc/postfix/
+postfix_user: postfix
+postfix_group: postfix
+iptables_input_chain: INPUT
+public_eth: eth0

@@ -7,13 +7,38 @@
 - name: Include OS-specific taks
   include: "{{ ansible_os_family }}.yml"
 
-- name: Intall python packages
+- name: Intall python3 packages
   pip: executable=pip3 name={{ item }} state=present
-  with-items:
+  with_items:
       - virtualenv
-      - circus
-      - gunicorn
       - psycopg2
       - configobj
       - mysqlclient
       - py-bcrypt
+
+- name: Intall python packages
+  pip: executable=pip name={{ item }} state=present
+  with_items:
+      - virtualenv
+      - psycopg2
+      - configobj
+      - mysqlclient
+      - py-bcrypt
+
+- name: Intall circus python packages
+  pip: executable=pip3 name={{ item }} state=present
+  with_items:
+      - circus
+  when: python_run_circus
+
+- name: Intall gunicorn python packages
+  pip: executable=pip3 name={{ item }} state=present
+  with_items:
+      - gunicorn
+  when: python_run_gunicorn
+
+- name: Intall supervisor python packages
+  pip: executable=pip name={{ item }} state=present
+  with_items:
+      - supervisor
+  when: python_run_supervisor

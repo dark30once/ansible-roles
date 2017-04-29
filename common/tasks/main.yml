@@ -1,5 +1,8 @@
 ---
 
+- name: Show groups for this host
+  debug: var=group_names
+
 - name: Include OS-specific taks
   include: "{{ ansible_os_family }}.yml"
 

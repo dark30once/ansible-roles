@@ -1,0 +1,16 @@
+---
+# Debian/Ubuntu specific tasks
+
+- name: Install required debian packages
+  apt: name={{ item }} state=present update_cache=yes
+  with_items:
+      - mysql-server
+      - build-essential
+      - fontconfig
+      - redis-server
+      - mysql-server
+      - supervisor
+      - libxslt1.1
+      - libxslt1-dev
+      - libssl-dev
+      - libcrypto++-dev

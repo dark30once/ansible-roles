@@ -31,6 +31,13 @@
       - target: '/srv/www'
   when: selinux_host is defined and selinux_host
 
+- stat: path="{{ nginx_conf_file }}"
+  register: nginx_conf_file_exists
+
+- name: Make sure nginx conf file exists
+  copy: dest="{{ nginx_conf_file }}" content=""
+  when: nginx_conf_file_exists.stat.exists == False
+
 - name: set SELinux httpd_can_sendmail
   shell: setsebool -P httpd_can_sendmail on
   when: selinux_host is defined and selinux_host
@@ -44,7 +51,3 @@
 
 - name: Include PHP tasks
   include: "php.yml"
-
-- name: Include postfix tasks
-  include: "postfix.yml"
-

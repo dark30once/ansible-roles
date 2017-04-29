@@ -1,4 +1,22 @@
 ---
 
+- name: Enable Jessie-Backports
+  apt_repository:
+      repo: deb http://httpredir.debian.org/debian jessie-backports main
+      state: present
+  when: ansible_distribution_release == "jessie"
+
 - name: Install Debian updates (aptitude safe upgrade)
   apt: upgrade=safe update_cache=yes
+
+- name: Install basic debian packages
+  apt: name={{ item }} state=present update_cache=yes
+  with_items:
+      - debian-keyring
+      - git
+      - ntp
+      - vim
+      - screen
+      - htop
+      - cron
+      - curl
