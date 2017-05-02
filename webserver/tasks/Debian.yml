@@ -1,0 +1,61 @@
+---
+# Debian specific tasks
+
+- name: Install apache and php
+  apt: name={{ item }} state=latest default_release=jessie-backports force=yes
+  with_items:
+      - apache2
+      - php5
+      - php5-gd
+      - libapache2-mod-php5
+      - libapache2-mod-security2
+      - php5-mysql
+      - php5-pgsql
+      - php5-mcrypt
+      - python-pkg-resources
+      - python-setuptools
+      - python-cryptography
+      - python-psutil
+      - python-openssl
+      - python-acme
+      - python-certbot
+      - certbot
+  when: ansible_distribution_release == "jessie"
+
+- name: Install apache and php
+  apt: name={{ item }} state=latest
+  with_items:
+      - apache2
+      - php5
+      - php5-gd
+      - libapache2-mod-php5
+      - libapache2-mod-security2
+      - php5-mysql
+      - php5-pgsql
+      - php5-mcrypt
+      - python-pkg-resources
+      - python-setuptools
+      - python-cryptography
+      - python-psutil
+      - python-openssl
+      - python-acme
+      - python-certbot
+      - certbot
+  when: ansible_distribution_release != "jessie"
+
+- name: Create config files if not existing
+  copy: 
+      dest: '{{ item }}'
+      owner: 'root'
+      group: 'root'
+      mode: 640 
+      force: no
+      content: ""
+  with_items:
+      - '{{ apache_conf_file }}'
+
+- name: Disable apache modules on Debian
+  apache2_module: name="{{ item }}" state=absent
+  with_items:
+      - proxy
+      - cgi

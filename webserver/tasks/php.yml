@@ -16,6 +16,6 @@
         value: "Off"
         section: 'PHP'
       - key: 'error_log'
-        value: '/var/log/httpd/php.log'
+        value: "{{ apache_log_dir }}/php.log"
         section: 'PHP'
   notify: restart apache

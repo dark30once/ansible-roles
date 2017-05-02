@@ -1,0 +1,16 @@
+apache_conf_dir: /etc/apache2/conf-available
+apache_module_dir: /etc/apache2/mods-available
+apache_conf_enabled_dir: /etc/apache2/conf-enabled
+apache_log_dir: /var/log/apache2/
+vhosts_filename: vhosts.conf
+apache_service_name: apache2
+apache_user: www-data
+apache_group: www-data
+apache_listen_port: 80
+apache_listen_https_port: 443
+apache_conf_file: "{{apache_conf_dir}}/security.conf"
+apache_conf_enabled_file: "{{ apache_conf_enabled_dir }}/security.conf"
+php_conf_file: "/etc/php5/apache2/php.ini"
+postfix_conf_dir: /etc/postfix/
+postfix_user: postfix
+postfix_group: postfix

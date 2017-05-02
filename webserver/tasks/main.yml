@@ -8,7 +8,7 @@
   include: "{{ ansible_os_family }}.yml"
 
 - name: http service state
-  service: name=httpd state=started enabled=yes
+  service: name="{{ apache_service_name }}" state=started enabled=yes
   when: not skip_httpd_restart
 
 - name: setup fs
@@ -44,18 +44,22 @@
       line: "ServerSignature Off"
   notify: restart apache
 
+- name: Enable apache security conf on Debian
+  file: dest="{{ apache_conf_enabled_file }}" src="{{ apache_conf_file }}" state=link
+  when: ansible_os_family=="Debian"
+
 - name: setup docroots
   file: path={{ item.documentroot }} owner='{{apache_user}}' group='{{apache_group}}' mode=755 state=directory
-  with_items: '{{apache_vhosts}}'
+  with_items: '{{ apache_vhosts }}'
 
 - name: copy noindex
   copy: src=files/noindex dest={{ item.documentroot }}/ owner='{{apache_user}}' group='{{apache_group}}' mode=755
-  with_items: '{{apache_vhosts}}'
+  with_items: '{{ apache_vhosts }}'
   when: item.welcome is defined
 
 - name: remove defaultconf
   file: path={{ item.path }} state=absent
-  with_items: '{{apache_remove_files}}'
+  with_items: '{{ apache_remove_files }}'
 
 - name: setup vhosts
   template:
@@ -68,7 +72,3 @@
 
 - name: Include PHP tasks
   include: "php.yml"
-
-- name: Include postfix tasks
-  include: "postfix.yml"
-
