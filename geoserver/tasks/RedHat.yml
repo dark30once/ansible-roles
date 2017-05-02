@@ -1,4 +1,6 @@
 ---
 # RedHat/CentOS specific tasks
 
+- name: OS
+  debug: msg="{{ ansible_os_family }}"
 
