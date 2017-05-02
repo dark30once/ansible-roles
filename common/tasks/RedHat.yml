@@ -21,3 +21,13 @@
 
 - name: upgrade all packages
   yum: name=* state=latest update_cache=yes
+
+- name: Install basic packages
+  yum: name={{ item }} state=present update_cache=yes
+  with_items:
+      - git
+      - ntp
+      - vim
+      - screen
+      - htop
+      - curl
