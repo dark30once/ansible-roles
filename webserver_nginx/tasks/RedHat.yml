@@ -12,5 +12,4 @@
       - php-mysql
       - epel-release
       - certbot
-      - postfix
 

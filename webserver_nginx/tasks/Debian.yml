@@ -19,7 +19,6 @@
       - python-certbot
       - python-certbot-nginx
       - certbot
-      - postfix
   when: ansible_distribution_release == "jessie"
 
 - name: Install nginx and php
