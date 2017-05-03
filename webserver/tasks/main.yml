@@ -47,6 +47,7 @@
 - name: Enable apache security conf on Debian
   file: dest="{{ apache_conf_enabled_file }}" src="{{ apache_conf_file }}" state=link
   when: ansible_os_family=="Debian"
+  notify: restart apache
 
 - name: setup docroots
   file: path={{ item.documentroot }} owner='{{apache_user}}' group='{{apache_group}}' mode=755 state=directory
