@@ -10,7 +10,32 @@
   apt_repository: repo="deb http://www.rabbitmq.com/debian/ testing main" state=present update_cache=yes
 
 - name: Install required debian packages
-  apt: name={{ item }} state=present update_cache=yes
+  apt: name={{ item }} default_release=jessie-backports force=yes
+  with_items:
+      - rabbitmq-server
+      - redis-server
+      - build-essential
+      - binutils-doc
+      - autoconf
+      - flex
+      - bison
+      - libjpeg-dev
+      - libfreetype6-dev
+      - zlib1g-dev
+      - libzmq3-dev
+      - libgdbm-dev
+      - libncurses5-dev
+      - libxml2-dev
+      - libxslt-dev
+      - libssl-dev=1.0.2k-1~bpo8+1
+      - nodejs-dev=0.10.29~dfsg-2
+      - nodejs=0.10.29~dfsg-2
+      - nodejs-legacy=0.10.29~dfsg-2
+      - npm
+  when: ansible_distribution_release == "jessie"
+
+- name: Install required debian packages
+  apt: name={{ item }} state=latest
   with_items:
       - rabbitmq-server
       - redis-server
@@ -30,3 +55,4 @@
       - nodejs
       - nodejs-legacy
       - npm
+  when: ansible_distribution_release != "jessie"
