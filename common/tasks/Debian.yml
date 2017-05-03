@@ -20,3 +20,4 @@
       - htop
       - cron
       - curl
+      - pwgen

@@ -31,3 +31,4 @@
       - screen
       - htop
       - curl
+      - pwgen
