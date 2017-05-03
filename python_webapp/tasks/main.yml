@@ -11,6 +11,7 @@
   pip: executable=pip3 name={{ item }} state=present
   with_items:
       - virtualenv
+      - virtualenvwrapper
       - psycopg2
       - configobj
       - mysqlclient
@@ -20,6 +21,7 @@
   pip: executable=pip name={{ item }} state=present
   with_items:
       - virtualenv
+      - virtualenvwrapper
       - psycopg2
       - configobj
       - mysqlclient
