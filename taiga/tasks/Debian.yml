@@ -1,8 +1,32 @@
 ---
 # Debian specific tasks
 
+- name: Get RabbitMQ public apt key
+  apt_key: 
+        url: https://www.rabbitmq.com/rabbitmq-release-signing-key.asc
+        state: present
+
+- name: Enable RabbitMQ repository
+  apt_repository: repo="deb http://www.rabbitmq.com/debian/ testing main" state=present update_cache=yes
+
 - name: Install required debian packages
   apt: name={{ item }} state=present update_cache=yes
   with_items:
-      - rabbitmq
+      - rabbitmq-server
       - redis-server
+      - build-essential
+      - binutils-doc
+      - autoconf
+      - flex
+      - bison
+      - libjpeg-dev
+      - libfreetype6-dev
+      - zlib1g-dev
+      - libzmq3-dev
+      - libgdbm-dev
+      - libncurses5-dev
+      - libxml2-dev
+      - libxslt-dev
+      - nodejs
+      - nodejs-legacy
+      - npm

@@ -7,5 +7,50 @@
 - name: Include OS-specific taks
   include: "{{ ansible_os_family }}.yml"
 
-- name: postgresql service state
-  service: name=postgresql state=started enabled=yes
+- name: Generate taiga secret key
+  shell: "pwgen -s -n 40 1"
+  register: taiga_secret_key
+
+- name: Create postgresql user
+  become_user: postgres 
+  postgresql_user: name=taiga
+
+- name: Create postgresql taiga database
+  become_user: postgres 
+  postgresql_db:
+      name: taiga
+      owner: taiga
+      encoding: UTF-8
+      template: template0
+
+- name: setup fs
+  file: path={{ item.path }} owner='root' group='root' mode=755 state=directory
+  with_items:
+      - path: /srv
+
+- name: Create taiga user
+  user:
+      name: taiga
+      home: /srv/taiga
+
+- name: get taiga-back
+  git:
+      repo: https://github.com/taigaio/taiga-back.git
+      dest: /srv/taiga/taiga-back
+      version: stable
+
+- name: get taiga-front
+  git:
+      repo: https://github.com/taigaio/taiga-front-dist.git
+      dest: /srv/taiga/taiga-front-dist
+      version: stable
+
+- name: get taiga-events
+  git:
+      repo: https://github.com/taigaio/taiga-events.git
+      dest: /srv/taiga/taiga-events
+
+- name: Install npm packages
+  npm: name="{{ item }}" global=yes
+  with_items:
+      - coffee-script
