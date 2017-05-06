@@ -1,0 +1,3 @@
+tomcat_version: tomcat8
+modjk_workers_file: /etc/libapache2-mod-jk/workers.properties
+tomcat_server_config_file: /etc/{{ tomcat_version }}/server.xml

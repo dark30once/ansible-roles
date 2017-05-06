@@ -7,5 +7,27 @@
 - name: Include OS-specific taks
   include: "{{ ansible_os_family }}.yml"
 
+- name: Modify mod-jk config
+  lineinfile: 
+      dest: "{{ modjk_workers_file }}"
+      regexp: "{{ item.regex }}"
+      line: "{{ item.line }}"
+      state: present
+  with_items:
+      - line: "worker.list=ajp13_worker"
+        regex: "^#?worker.list=.*"
+      - line: "worker.ajp13_worker.port=8009"
+        regex: "^#?worker.ajp13_worker.port="
+      - line: "worker.ajp13_worker.host=localhost"
+        regex: "^#?worker.ajp13_worker.host="
+      - line: "worker.ajp13_worker.type=ajp13"
+        regex: "^#?worker.ajp13_worker.type="
+
+- name: Modify tomcat config
+  template:
+      dest: "{{ tomcat_server_config_file }}"
+      src: tomcat_server.xml.j2
+
 - name: tomcat service state
-  service: name=tomcat7 state=started enabled=yes
+  service: name="{{ tomcat_version }}" state=started enabled=yes
+
