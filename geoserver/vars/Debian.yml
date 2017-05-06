@@ -1,2 +1,0 @@
-apache_sites_conf_dir: /etc/apache2/sites-available/
-apache_sites_conf_enabled_dir: /etc/apache2/sites-enabled/
