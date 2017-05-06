@@ -49,17 +49,23 @@
   when: ansible_os_family=="Debian"
   notify: restart apache
 
+- name: Show vhost config
+  debug: var=apache_vhosts
+
 - name: setup docroots
   file: path={{ item.documentroot }} owner='{{apache_user}}' group='{{apache_group}}' mode=755 state=directory
   with_items: '{{ apache_vhosts }}'
 
+- name: enable mod rewrite
+  apache2_module: name=rewrite state=present
+
 - name: copy noindex
   copy: src=files/noindex dest={{ item.documentroot }} owner='{{apache_user}}' group='{{apache_group}}' mode=755
+  when: item.welcome is defined and item.welcome
   with_items: '{{ apache_vhosts }}'
-  when: item.welcome is defined
 
 - name: copy noindex default docroot
-  copy: src=files/noindex/* dest={{ default_docroot }}/ owner='{{apache_user}}' group='{{apache_group}}' mode=755
+  copy: src=files/noindex/ dest={{ default_docroot }}/ owner='{{apache_user}}' group='{{apache_group}}' mode=755
   with_items: '{{ apache_vhosts }}'
   when: default_docroot is defined
 
@@ -70,10 +76,26 @@
 - name: setup vhosts
   template:
       src: "vhosts.conf.j2"
-      dest: "{{ apache_conf_dir }}/{{ vhosts_filename }}"
+      dest: "{{ apache_sites_conf_dir }}/{{ item.servername }}.conf"
       owner: root
       group: root
       mode: 0644
+  with_items: "{{ apache_vhosts }}"
+  notify: restart apache
+
+- name: enable vhost config
+  file: 
+      dest: "{{ apache_sites_conf_enabled_dir }}/{{ item.servername }}.conf"
+      src: "{{ apache_sites_conf_dir }}/{{ item.servername }}.conf"
+      state: link
+  with_items: "{{ apache_vhosts }}"
+  when: ansible_os_family=='Debian'
+  notify: restart apache
+
+- name: setup lets encrypt SSL
+  shell: certbot certonly --keep -n --apache -m "{{ item.admin_from_email }}" -d "{{ item.servername }}" --agree-tos
+  when: item.use_https is defined and item.use_https
+  with_items: "{{ apache_vhosts }}"
   notify: restart apache
 
 - name: Include PHP tasks

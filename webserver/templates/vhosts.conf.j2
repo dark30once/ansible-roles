@@ -1,37 +1,65 @@
-{# Set up VirtualHosts #}
 
-DirectoryIndex index.html index.php
+{% if item.use_https %}
+<VirtualHost *:443>
+{% else %}
+<VirtualHost *:80>
+{% endif %}
+    ServerName {{ item.servername }}
+    RewriteEngine On
+{% if item.use_https %}
+    SSLEngine On
+    SSLProtocol all -SSLv2 -SSLv3
+    SSLHonorCipherOrder on
+    SSLCipherSuite "EECDH+ECDSA+AESGCM EECDH+aRSA+AESGCM EECDH+ECDSA+SHA384 EECDH+ECDSA+SHA256 EECDH+aRSA+SHA384 EECDH+aRSA+SHA256 EECDH EDH+aRSA !aNULL !eNULL !LOW !MEDIUM !3DES !MD5 !EXP !PSK !SRP !DSS !RC4"
+    SSLCertificateFile /etc/letsencrypt/live/{{ item.servername }}/cert.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/{{ item.servername }}/privkey.pem
+    SSLCertificateChainFile /etc/letsencrypt/live/{{ item.servername }}/chain.pem
+{% endif %}
+    
+{% if item.serveralias is defined %}
+    ServerAlias {{ item.serveralias }}
+{% endif %}
 
-{% for vhost in apache_vhosts %}
-<VirtualHost *:{{ apache_listen_port }}>
-  ServerName {{ vhost.servername }}
-  RewriteEngine On
-{% if vhost.serveralias is defined %}
-  ServerAlias {{ vhost.serveralias }}
-{% endif %}
-{% if vhost.documentroot is defined %}
-  DocumentRoot {{ vhost.documentroot }}
+{% if item.documentroot is defined %}
+    DocumentRoot {{ item.documentroot }}
 {% endif %}
 
-  ServerAdmin dolfandringa@gmail.com
-{% if vhost.documentroot is defined %}
-  <Directory "{{ vhost.documentroot }}/">
-    {% if vhost.redirect is defined %}
-        RewriteRule ^(.*)$ {{ vhost.redirect }} [L,R=301]
-    {% endif %}
-    AllowOverride All
-    Options -Indexes +FollowSymLinks
-    Require all granted
-  </Directory>
-  {% if vhost.welcome is defined %}
-  <LocationMatch "^/$">
-    ErrorDocument 403 /noindex/index.html
-  </LocationMatch>
-  {% endif %}
+    ServerAdmin {{ item.admin_from_email }}
+
+{% if item.documentroot is defined %}
+    <Directory "{{ item.documentroot }}/">
+
+{% if item.redirect is defined %}
+        RewriteRule ^(.*)$ {{ item.redirect }} [L,R=301]
 {% endif %}
-{% if vhost.extra_parameters is defined %}
-  {{ vhost.extra_parameters }}
+        AllowOverride All
+        Options -Indexes +FollowSymLinks
+        Require all granted
+    </Directory>
+{% if item.welcome is defined %}
+    <LocationMatch "^/$">
+        ErrorDocument 403 /noindex/index.html
+    </LocationMatch>
+{% endif %}
+{% endif %}
+{% if item.extra_parameters is defined %}
+    {{ item.extra_parameters }}
 {% endif %}
 </VirtualHost>
 
-{% endfor %}
+{% if item.use_https %}
+<VirtualHost *:80>
+    ServerName {{ item.servername }}
+    ServerAdmin {{ item.admin_from_email }}
+    RewriteEngine on
+{% if item.documentroot is defined %}
+    DocumentRoot {{ item.documentroot }}
+    <Directory "{{ item.documentroot }}/">
+        AllowOverride All
+        Options -Indexes +FollowSymLinks
+        Require all granted
+        RewriteRule ^(.*)$  https://{{ item.servername }}/$1  [R=301,L]
+    </Directory>
+{% endif %}
+</VirtualHost>
+{% endif %}
