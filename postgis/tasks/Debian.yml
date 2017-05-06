@@ -2,7 +2,17 @@
 # Debian specific tasks
 
 - name: Install required debian packages
-  apt: name={{ item }} state=present update_cache=yes
+  apt: name={{ item }} state=present update_cache=yes force=yes
   with_items:
       - postgresql
       - postgresql-contrib
+      - postgresql-server-dev-all
+      - postgis
+      - python3-pip
+      - python-pip
+      - python3-dev
+      - python-dev
+      - postgresql-server-dev-9.4
+      - libpq-dev
+      - libpq5=9.4.10-0+deb8u1
+      
