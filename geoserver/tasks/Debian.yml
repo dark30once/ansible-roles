@@ -2,6 +2,4 @@
 # Debian/Ubuntu specific tasks
 
 
-- name: OS
-  debug: msg="{{ ansible_os_version }}"
 

@@ -1,2 +1,9 @@
+skip_httpd_restart: false
 postgresql_version: 9.4
 postgresql_conf_dir: /etc/postgresql/{{postgresql_version}}/main/
+tomcat_webapp_dir: /var/lib/{{ tomcat_version }}/webapps/
+jre_dir: /usr/lib/jvm/java-8-oracle/
+hostname: geoserver.lan
+use_https: true
+admin_from_email: info@example.com
+skip_postgis_db: false
