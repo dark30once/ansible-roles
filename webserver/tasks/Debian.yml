@@ -1,7 +1,7 @@
 ---
 # Debian specific tasks
 
-- name: Install apache and php
+- name: Install apache and php Debian Jessie
   apt: name={{ item }} state=latest default_release=jessie-backports force=yes
   with_items:
       - apache2
@@ -22,7 +22,7 @@
       - certbot
   when: ansible_distribution_release == "jessie"
 
-- name: Install apache and php
+- name: Install apache and php other Debian
   apt: name={{ item }} state=latest
   with_items:
       - apache2

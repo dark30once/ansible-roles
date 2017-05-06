@@ -54,9 +54,14 @@
   with_items: '{{ apache_vhosts }}'
 
 - name: copy noindex
-  copy: src=files/noindex dest={{ item.documentroot }}/ owner='{{apache_user}}' group='{{apache_group}}' mode=755
+  copy: src=files/noindex dest={{ item.documentroot }} owner='{{apache_user}}' group='{{apache_group}}' mode=755
   with_items: '{{ apache_vhosts }}'
   when: item.welcome is defined
+
+- name: copy noindex default docroot
+  copy: src=files/noindex/* dest={{ default_docroot }}/ owner='{{apache_user}}' group='{{apache_group}}' mode=755
+  with_items: '{{ apache_vhosts }}'
+  when: default_docroot is defined
 
 - name: remove defaultconf
   file: path={{ item.path }} state=absent
