@@ -6,13 +6,15 @@
   with_items:
       - postgresql
       - postgresql-contrib
+      - postgresql-{{ postgresql_version }}-postgis-scripts=2.3*
       - postgresql-server-dev-all
-      - postgis
+      - postgresql-{{ postgresql_version }}-postgis-2.3
+      - postgis=2.3*
       - python3-pip
       - python-pip
       - python3-dev
       - python-dev
-      - postgresql-server-dev-9.4
+      - postgresql-server-dev-{{ postgresql_version }}
       - libpq-dev
-      - libpq5=9.4.10-0+deb8u1
-      
+      - libpq5={{ postgresql_version }}*
+
