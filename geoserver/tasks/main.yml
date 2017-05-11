@@ -7,29 +7,38 @@
 - name: Include OS-specific taks
   include: "{{ ansible_os_family }}.yml"
 
+- debug: var=make_postgis_db
+
 - name: Generate postgis password
   shell: pwgen -s 20 1
   register: postgis_pwd
-  when: not skip_postgis_db
+  when: make_postgis_db
 
 - name: "Postgis password"
   debug: var=postgis_pwd.stdout
-  when: not skip_postgis_db
+  when: make_postgis_db
 
 - name: Make postgis geoserver user
   become_user: postgres
-  postgresql_user: name=geoserver password="{{ postgis_pwd.stdout }}"
-  when: not skip_postgis_db
+  postgresql_user: 
+    name: geoserver 
+    password: "{{ postgis_pwd.stdout }}"
+  when: make_postgis_db
 
 - name: Make geoserver db
   become_user: postgres
   postgresql_db: name=geoserver owner=geoserver template=template0 encoding=UTF-8
-  when: not skip_postgis_db
+  when: make_postgis_db
 
-- name: Enable postgis extension
+- name: Enable postgresql extension s
   become_user: postgres
-  postgresql_ext: name=postgis db=geoserver
-  when: not skip_postgis_db
+  postgresql_ext: 
+    name: "{{ item }}"
+    db: geoserver
+  with_items:
+      - postgis
+      - hstore
+  when: make_postgis_db
 
 - name: Copy geoserver war
   copy:
