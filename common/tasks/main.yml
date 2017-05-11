@@ -2,6 +2,7 @@
 
 - name: Show groups for this host
   debug: var=group_names
+  notify: include OS-specific handlers
 
 - name: Include OS-specific taks
   include: "{{ ansible_os_family }}.yml"
