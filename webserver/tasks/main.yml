@@ -56,22 +56,51 @@
   file: path={{ item.documentroot }} owner='{{apache_user}}' group='{{apache_group}}' mode=755 state=directory
   with_items: '{{ apache_vhosts }}'
 
-- name: enable mod rewrite
-  apache2_module: name=rewrite state=present
+- name: enable apache modules
+  apache2_module: 
+      name: "{{ item }}"
+      state: present
+  with_items:
+      - ssl
+      - rewrite
 
-- name: copy noindex
-  copy: src=files/noindex dest={{ item.documentroot }} owner='{{apache_user}}' group='{{apache_group}}' mode=755
+- name: disable apache modules
+  apache2_module:
+      name: "{{ item }}"
+      state: present
+  with_items:
+      - cgi
+      - proxy
+
+- name: sync noindex
+  synchronize: src=files/noindex dest={{ item.documentroot }}
   when: item.welcome is defined and item.welcome
   with_items: '{{ apache_vhosts }}'
 
-- name: copy noindex default docroot
-  copy: src=files/noindex/ dest={{ default_docroot }}/ owner='{{apache_user}}' group='{{apache_group}}' mode=755
+- name: set noindex perms
+  file: recurse=yes path={{ item.documentroot }}  owner='{{apache_user}}' group='{{apache_group}}' mode=755
+  when: item.welcome is defined and item.welcome
+  with_items: '{{ apache_vhosts }}'
+
+- name: sync noindex default docroot
+  synchronize: src=files/noindex/ dest={{ default_docroot }}/
   with_items: '{{ apache_vhosts }}'
   when: default_docroot is defined
+
+- name: set default docroot perms
+  file: recurse=yes path={{ default_docroot }}/ owner='{{apache_user}}' group='{{apache_group}}' mode=755
+  when: item.welcome is defined and item.welcome
+  with_items: '{{ apache_vhosts }}'
 
 - name: remove defaultconf
   file: path={{ item.path }} state=absent
   with_items: '{{ apache_remove_files }}'
+
+- name: setup lets encrypt SSL
+  shell: certbot certonly --keep -n --apache -m "{{ item.admin_from_email }}" -d "{{ item.servername }}" --agree-tos
+  when: item.use_https is defined and item.use_https
+  with_items: "{{ apache_vhosts }}"
+  notify: restart apache
 
 - name: setup vhosts
   template:
@@ -90,12 +119,6 @@
       state: link
   with_items: "{{ apache_vhosts }}"
   when: ansible_os_family=='Debian'
-  notify: restart apache
-
-- name: setup lets encrypt SSL
-  shell: certbot certonly --keep -n --apache -m "{{ item.admin_from_email }}" -d "{{ item.servername }}" --agree-tos
-  when: item.use_https is defined and item.use_https
-  with_items: "{{ apache_vhosts }}"
   notify: restart apache
 
 - name: Include PHP tasks
