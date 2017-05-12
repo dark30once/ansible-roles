@@ -61,6 +61,40 @@
       repo: https://github.com/taigaio/taiga-events.git
       dest: /srv/taiga/taiga-events
 
+- name: virtualenv and requirements
+- pip:
+    virtualenv_python: python3
+    requirements: /srv/taiga/taiga-back/requirements.txt
+    virtualenv: /srv/taiga/venv
+
+- name: populating db with initial basic data
+- django_manage:
+    command: migrate
+    virtualenv: /srv/taiga/venv
+    app_path: /srv/taiga/taiga-back
+
+- name: populating db with initial user
+- django_manage:
+    command: loaddata
+    virtualenv: /srv/taiga/venv
+    app_path: /srv/taiga/taiga-back
+    fixtures: initial_user initial_project_templates
+
+- name: compile messages
+- django_manage:
+    command: "{{ item }}"
+    virtualenv: /srv/taiga/venv
+    app_path: /srv/taiga/taiga-back
+  with_items:
+    - collectstatic
+    - compilemessages
+
+- name: collect static
+- django_manage:
+    command: collectstatic
+    virtualenv: /srv/taiga/venv
+    app_path: /srv/taiga/taiga-back
+
 - name: Install npm packages
   npm: name="{{ item }}" global=yes
   with_items:
