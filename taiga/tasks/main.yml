@@ -109,6 +109,7 @@
 - template:
     src: /templates/taiga-celery.ini
     dest: /etc/circus/conf.d
+  notify: reload circus
 
 
 

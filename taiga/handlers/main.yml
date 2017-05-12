@@ -3,3 +3,10 @@
   service:
       name: postgresql
       state: restarted
+
+- name: reload circus
+- shell: circusctl {{ items }}
+  with_items:
+    - reloadconfig
+    - restart taiga
+    - start taiga-celery
