@@ -45,46 +45,46 @@
   become_user: taiga
   git:
       repo: https://github.com/taigaio/taiga-back.git
-      dest: /srv/taiga/taiga-back
+      dest: "{{ taiga_base_url }}/taiga-back"
       version: stable
 
 - name: get taiga-front
   become_user: taiga
   git:
       repo: https://github.com/taigaio/taiga-front-dist.git
-      dest: /srv/taiga/taiga-front-dist
+      dest: "{{ taiga_base_url }}/taiga-front-dist"
       version: stable
 
 - name: get taiga-events
   become_user: taiga
   git:
       repo: https://github.com/taigaio/taiga-events.git
-      dest: /srv/taiga/taiga-events
+      dest: "{{ taiga_base_url }}/taiga-events"
 
 - name: virtualenv and requirements
 - pip:
     virtualenv_python: python3
-    requirements: /srv/taiga/taiga-back/requirements.txt
-    virtualenv: /srv/taiga/venv
+    requirements: "{{ taiga_base_url }}/taiga-back/requirements.txt"
+    virtualenv: "{{ taiga_base_url }}/venv"
 
 - name: populating db with initial basic data
 - django_manage:
     command: migrate
-    virtualenv: /srv/taiga/venv
-    app_path: /srv/taiga/taiga-back
+    virtualenv: "{{ taiga_base_url }}/venv"
+    app_path: "{{ taiga_base_url }}/taiga-back"
 
 - name: populating db with initial user
 - django_manage:
     command: loaddata
-    virtualenv: /srv/taiga/venv
-    app_path: /srv/taiga/taiga-back
+    virtualenv: "{{ taiga_base_url }}/venv"
+    app_path: "{{ taiga_base_url }}/taiga-back"
     fixtures: initial_user initial_project_templates
 
 - name: compile messages
 - django_manage:
     command: "{{ item }}"
-    virtualenv: /srv/taiga/venv
-    app_path: /srv/taiga/taiga-back
+    virtualenv: "{{ taiga_base_url }}/venv"
+    app_path: "{{ taiga_base_url }}/taiga-back"
   with_items:
     - collectstatic
     - compilemessages
@@ -92,10 +92,38 @@
 - name: collect static
 - django_manage:
     command: collectstatic
-    virtualenv: /srv/taiga/venv
-    app_path: /srv/taiga/taiga-back
+    virtualenv: "{{ taiga_base_url }}/venv"
+    app_path: "{{ taiga_base_url }}/taiga-back"
 
 - name: Install npm packages
   npm: name="{{ item }}" global=yes
   with_items:
       - coffee-script
+
+- name: putting the local.py
+- template:
+    src: /templates/local.py
+    dest: "{{ taiga_base_url }}/taiga-back"
+
+- name: putting taiga celery conf
+- template:
+    src: /templates/taiga-celery.ini
+    dest: /etc/circus/conf.d
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,3 +1,5 @@
 taiga_http_scheme: "http"
 taiga_domain: "example.com"
 taiga_from_email: "no-reply@example.com"
+taiga_base_url: "/srv/taiga/"
+taiga_virtualenv: "{{ taiga_base_url }}/venv"
