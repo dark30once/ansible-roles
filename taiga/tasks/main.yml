@@ -111,8 +111,10 @@
     dest: /etc/circus/conf.d
   notify: reload circus
 
-
-
+- name: editing the conf.json
+- template:
+    src: /templates/conf.json
+    dest: "{{ taiga_base_url }}/taiga-front-dist/dist/conf.json"
 
 
 
