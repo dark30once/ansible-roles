@@ -62,26 +62,26 @@
       dest: "{{ taiga_base_url }}/taiga-events"
 
 - name: virtualenv and requirements
-- pip:
+  pip:
     virtualenv_python: python3
     requirements: "{{ taiga_base_url }}/taiga-back/requirements.txt"
     virtualenv: "{{ taiga_base_url }}/venv"
 
 - name: populating db with initial basic data
-- django_manage:
+  django_manage:
     command: migrate
     virtualenv: "{{ taiga_base_url }}/venv"
     app_path: "{{ taiga_base_url }}/taiga-back"
 
 - name: populating db with initial user
-- django_manage:
+  django_manage:
     command: loaddata
     virtualenv: "{{ taiga_base_url }}/venv"
     app_path: "{{ taiga_base_url }}/taiga-back"
     fixtures: initial_user initial_project_templates
 
 - name: compile messages
-- django_manage:
+  django_manage:
     command: "{{ item }}"
     virtualenv: "{{ taiga_base_url }}/venv"
     app_path: "{{ taiga_base_url }}/taiga-back"
@@ -90,7 +90,7 @@
     - compilemessages
 
 - name: collect static
-- django_manage:
+  django_manage:
     command: collectstatic
     virtualenv: "{{ taiga_base_url }}/venv"
     app_path: "{{ taiga_base_url }}/taiga-back"
@@ -101,22 +101,31 @@
       - coffee-script
 
 - name: putting the local.py
-- template:
+  template:
     src: /templates/local.py
     dest: "{{ taiga_base_url }}/taiga-back"
 
 - name: putting taiga celery conf
-- template:
+  template:
     src: /templates/taiga-celery.ini
     dest: /etc/circus/conf.d
   notify: reload circus
 
 - name: editing the conf.json
-- template:
+  template:
     src: /templates/conf.json
     dest: "{{ taiga_base_url }}/taiga-front-dist/dist/conf.json"
 
+- name: create password for rabbitmq
+  shell: "pwgen -s -n 40 1"
+  register: rabbitmq_password
 
+- name: rabbitmqctl commands
+  shell: rabbitmqctl {{ items }}
+  with_items:
+    - add_user taiga {{ rabbitmq_password }}
+    - add_vhost taiga
+    - set_permissions -p taiga
 
 
 
