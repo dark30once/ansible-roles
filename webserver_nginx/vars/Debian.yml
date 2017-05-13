@@ -11,6 +11,4 @@ nginx_conf_enabled_dir: /etc/nginx/conf.d
 nginx_sites_conf_dir: /etc/nginx/sites-available
 nginx_sites_conf_enabled_dir: /etc/nginx/sites-enabled
 nginx_log_dir: /var/log/nginx/
-nginx_service_name: nginx
-nginx_conf_file: "{{nginx_conf_dir}}/security.conf"
 nginx_conf_enabled_file: "{{ nginx_conf_enabled_dir }}/security.conf"

@@ -74,10 +74,10 @@
   with_items: '{{ nginx_remove_files }}'
 
 - name: setup lets encrypt SSL
-  shell: certbot certonly --keep -n --apache -m "{{ item.admin_from_email }}" -d "{{ item.servername }}" --agree-tos
+  shell: certbot certonly --keep -n --nginx -m "{{ item.admin_from_email }}" -d "{{ item.servername }}" --agree-tos
   when: item.use_https is defined and item.use_https
   with_items: "{{ nginx_vhosts }}"
-  notify: restart apache
+  notify: restart nginx
 
 - name: setup vhosts
   template:
@@ -87,16 +87,16 @@
       group: root
       mode: 0644
   with_items: "{{ nginx_vhosts }}"
-  notify: restart apache
+  notify: restart nginx
 
 - name: enable vhost config
   file: 
       dest: "{{ nginx_sites_conf_enabled_dir }}/{{ item.servername }}.conf"
       src: "{{ nginx_sites_conf_dir }}/{{ item.servername }}.conf"
       state: link
-  with_items: "{{ apache_vhosts }}"
+  with_items: "{{ nginx_vhosts }}"
   when: nginx_sites_conf_enabled_dir!=nginx_sites_conf_dir
-  notify: restart apache
+  notify: restart nginx
 
 - name: Include PHP tasks
   include: "php.yml"

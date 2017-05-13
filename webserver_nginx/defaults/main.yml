@@ -2,3 +2,4 @@ skip_httpd_restart: false
 nginx_vhosts: []
 nginx_remove_files: []
 nginx_conf_enable_dir:
+nginx_service_name: nginx

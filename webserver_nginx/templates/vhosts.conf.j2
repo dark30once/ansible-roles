@@ -42,28 +42,14 @@ server {
         return 301 {{ item.redirect }}$request_uri;
 {% endif %}
     }
-{% if item.locations is defined %}
-{% for location in item.locations %}
-    location {{ location.url }} {
-{% if location.reverse_proxy is defined %}
-        proxy_set_header Host $http_host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_pass {{ location.reverse_proxy.url }};
-        proxy_redirect off;
-{% endif %}
-{% if location.alias is defined %}
-        alias {{ location.alias }};
-{% endif %}
-    }
-{% endfor %}
-{% endif %}
+#START ANSIBLE MANAGED BLOCK
+#END ANSIBLE MANAGED BLOCK
+
 
 {% if item.extra_parameters is defined %}
     {{ item.extra_parameters }}
 {% endif %}
-
+}
 
 {% if item.use_https %}
 server{
