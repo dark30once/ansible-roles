@@ -5,7 +5,7 @@ STATIC_URL = "{{ taiga_http_scheme }}://{{ taiga_domain }}/static/"
 SITES["front"]["scheme"] = "{{ taiga_http_scheme }}"
 SITES["front"]["domain"] = "{{ taiga_domain }}"
 
-SECRET_KEY = "{{ taiga_secret_key }}"
+SECRET_KEY = "{{ taiga_secret_key.stdout }}"
 
 DEBUG = False
 CELERY_ENABLED = True

@@ -111,13 +111,13 @@
   shell: "pwgen -s -n 40 1"
   register: rabbitmq_password
 
-- name: Taiga secret key
-  debug: var=taiga_secret_key
+- name: rabbitmq password
+  debug: var=rabbitmq_password
 
 - name: rabbitmqctl commands
   shell: rabbitmqctl {{ item }}
   with_items:
-    - add_user taiga {{ rabbitmq_password }}
+    - add_user taiga {{ rabbitmq_password.stdout }}
     - add_vhost taiga
     - set_permissions -p taiga ".*" ".*" ".*"
 
