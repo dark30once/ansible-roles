@@ -19,6 +19,7 @@
       - autoconf
       - flex
       - bison
+      - libffi-dev
       - libjpeg-dev
       - libfreetype6-dev
       - zlib1g-dev
@@ -32,6 +33,7 @@
       - nodejs=0.10.29~dfsg-2
       - nodejs-legacy=0.10.29~dfsg-2
       - npm
+      - gettext
   when: ansible_distribution_release == "jessie"
 
 - name: Install required debian packages
@@ -44,6 +46,7 @@
       - autoconf
       - flex
       - bison
+      - libffi-dev
       - libjpeg-dev
       - libfreetype6-dev
       - zlib1g-dev
@@ -55,4 +58,5 @@
       - nodejs
       - nodejs-legacy
       - npm
+      - gettext
   when: ansible_distribution_release != "jessie"
