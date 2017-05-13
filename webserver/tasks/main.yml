@@ -88,7 +88,7 @@
   when: default_docroot is defined
 
 - name: set default docroot perms
-  file: recurse=yes path={{ default_docroot }}/ owner='{{apache_user}}' group='{{apache_group}}' mode=755
+  file: recurse=yes path={{ item.documentroot }}/ owner='{{apache_user}}' group='{{apache_group}}' mode=755
   when: item.welcome is defined and item.welcome
   with_items: '{{ apache_vhosts }}'
 
