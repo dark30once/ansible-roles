@@ -41,6 +41,9 @@
   with_items:
       - path: /srv/taiga/logs
 
+- name: what is taiga_base_url
+  debug: var=taiga_base_url
+
 - name: get taiga-back
   become_user: taiga
   git:
@@ -68,12 +71,14 @@
     virtualenv: "{{ taiga_base_url }}/venv"
 
 - name: populating db with initial basic data
+  become_user: taiga
   django_manage:
     command: migrate
     virtualenv: "{{ taiga_base_url }}/venv"
     app_path: "{{ taiga_base_url }}/taiga-back"
 
 - name: populating db with initial user
+  become_user: taiga
   django_manage:
     command: loaddata
     virtualenv: "{{ taiga_base_url }}/venv"
@@ -81,6 +86,7 @@
     fixtures: initial_user initial_project_templates
 
 - name: compile messages
+  become_user: taiga
   django_manage:
     command: "{{ item }}"
     virtualenv: "{{ taiga_base_url }}/venv"
@@ -90,6 +96,7 @@
     - compilemessages
 
 - name: collect static
+  become_user: taiga
   django_manage:
     command: collectstatic
     virtualenv: "{{ taiga_base_url }}/venv"
@@ -100,32 +107,37 @@
   with_items:
       - coffee-script
 
-- name: putting the local.py
-  template:
-    src: /templates/local.py
-    dest: "{{ taiga_base_url }}/taiga-back"
+- name: create password for rabbitmq
+  shell: "pwgen -s -n 40 1"
+  register: rabbitmq_password
+
+- name: Taiga secret key
+  debug: var=taiga_secret_key
+
+- name: rabbitmqctl commands
+  shell: rabbitmqctl {{ item }}
+  with_items:
+    - add_user taiga {{ rabbitmq_password }}
+    - add_vhost taiga
+    - set_permissions -p taiga ".*" ".*" ".*"
 
 - name: putting taiga celery conf
   template:
-    src: /templates/taiga-celery.ini
+    src: taiga-celery.ini.j2
     dest: /etc/circus/conf.d
   notify: reload circus
 
 - name: editing the conf.json
   template:
-    src: /templates/conf.json
+    src: conf.json.j2
     dest: "{{ taiga_base_url }}/taiga-front-dist/dist/conf.json"
 
-- name: create password for rabbitmq
-  shell: "pwgen -s -n 40 1"
-  register: rabbitmq_password
+- name: putting the local.py
+  template:
+    src: local.py.j2
+    dest: "{{ taiga_base_url }}/taiga-back"
 
-- name: rabbitmqctl commands
-  shell: rabbitmqctl {{ items }}
-  with_items:
-    - add_user taiga {{ rabbitmq_password }}
-    - add_vhost taiga
-    - set_permissions -p taiga
+
 
 
 

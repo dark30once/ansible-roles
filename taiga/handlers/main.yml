@@ -5,7 +5,7 @@
       state: restarted
 
 - name: reload circus
-- shell: circusctl {{ items }}
+  shell: circusctl {{ items }}
   with_items:
     - reloadconfig
     - restart taiga
