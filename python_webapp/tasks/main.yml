@@ -27,19 +27,19 @@
       - mysqlclient
       - py-bcrypt
 
-- name: Intall circus python packages
+- name: Install circus python packages
   pip: executable=pip3 name={{ item }} state=present
   with_items:
       - circus
   when: python_run_circus
 
-- name: Intall gunicorn python packages
+- name: Install gunicorn python packages
   pip: executable=pip3 name={{ item }} state=present
   with_items:
       - gunicorn
   when: python_run_gunicorn
 
-- name: Intall supervisor python packages
+- name: Install supervisor python packages
   pip: executable=pip name={{ item }} state=present
   with_items:
       - supervisor
