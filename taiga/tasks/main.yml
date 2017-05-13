@@ -7,6 +7,47 @@
 - name: Include OS-specific taks
   include: "{{ ansible_os_family }}.yml"
 
+- name: debugging
+  debug: var=nginx_sites_conf_dir
+
+- name: Setup taiga specific nginx stuff
+  blockinfile:
+      dest: "{{ nginx_sites_conf_dir }}/{{ item.servername }}.conf"
+      block: |
+        location /api {
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_pass http://127.0.0.1:8001/api;
+            proxy_redirect off;
+        }
+        location /admin {
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_pass http://127.0.0.1:8001$request_uri;
+            proxy_redirect off;
+        }
+        location /events {
+            proxy_pass http://127.0.0.1:8888/events;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_connect_timeout 7d;
+            proxy_send_timeout 7d;
+            proxy_read_timeout 7d;
+        }
+        location /static {
+            alias /srv/taiga/taiga-back/static;
+        }
+        location /media {
+            alias /srv/taiga/taiga-back/media;
+        }
+  when: "{{ item.taiga }} is defined and {{ item.taiga }}"  
+  with_items: "{{ nginx_vhosts }}"
+
 - name: Generate taiga secret key
   shell: "pwgen -s -n 40 1"
   register: taiga_secret_key
@@ -62,26 +103,26 @@
       dest: "{{ taiga_base_url }}/taiga-events"
 
 - name: virtualenv and requirements
-- pip:
+  pip:
     virtualenv_python: python3
     requirements: "{{ taiga_base_url }}/taiga-back/requirements.txt"
     virtualenv: "{{ taiga_base_url }}/venv"
 
 - name: populating db with initial basic data
-- django_manage:
+  django_manage:
     command: migrate
     virtualenv: "{{ taiga_base_url }}/venv"
     app_path: "{{ taiga_base_url }}/taiga-back"
 
 - name: populating db with initial user
-- django_manage:
+  django_manage:
     command: loaddata
     virtualenv: "{{ taiga_base_url }}/venv"
     app_path: "{{ taiga_base_url }}/taiga-back"
     fixtures: initial_user initial_project_templates
 
 - name: compile messages
-- django_manage:
+  django_manage:
     command: "{{ item }}"
     virtualenv: "{{ taiga_base_url }}/venv"
     app_path: "{{ taiga_base_url }}/taiga-back"
@@ -90,40 +131,25 @@
     - compilemessages
 
 - name: collect static
-- django_manage:
+  django_manage:
     command: collectstatic
     virtualenv: "{{ taiga_base_url }}/venv"
     app_path: "{{ taiga_base_url }}/taiga-back"
 
 - name: Install npm packages
-  npm: name="{{ item }}" global=yes
+  npm: 
+    name: "{{ item }}"
+    global: yes
   with_items:
       - coffee-script
 
 - name: putting the local.py
-- template:
+  template:
     src: /templates/local.py
     dest: "{{ taiga_base_url }}/taiga-back"
 
 - name: putting taiga celery conf
-- template:
+  template:
     src: /templates/taiga-celery.ini
     dest: /etc/circus/conf.d
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
