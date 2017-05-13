@@ -157,12 +157,14 @@
 - name: rabbitmq password
   debug: var=rabbitmq_password
 
-- name: rabbitmqctl commands
-  shell: rabbitmqctl {{ item }}
-  with_items:
-    - add_user taiga {{ rabbitmq_password.stdout }}
-    - add_vhost taiga
-    - set_permissions -p taiga ".*" ".*" ".*"
+- name: rabbitmqctl add user
+  shell: rabbitmqctl add_user taiga "{{ rabbitmq_password.stdout }}"
+
+- name: rabbitmqctl add vhost
+  shell: rabbitmqctl add_vhost taiga
+
+- name: rabbitmqctl set permissions
+  shell: rabbitmqctl set_permissions -p taiga taiga ".*" ".*" ".*"
 
 - name: putting taiga celery conf
   template:
