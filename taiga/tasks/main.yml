@@ -166,6 +166,12 @@
 - name: rabbitmqctl set permissions
   shell: rabbitmqctl set_permissions -p taiga taiga ".*" ".*" ".*"
 
+- name: setup celery path for conf file
+  file: path={{ item.path }} owner='root' group='root' mode=755 state=directory
+  with_items:
+      - path: /etc/circus
+      - path: /etc/circus/conf.d
+
 - name: putting taiga celery conf
   template:
     src: taiga-celery.ini.j2
