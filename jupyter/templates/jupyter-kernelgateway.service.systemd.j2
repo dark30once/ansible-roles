@@ -1,0 +1,9 @@
+[Unit]
+Description='Jupyter Kernelgateway Server'
+
+[Service]
+Type=simple
+WorkingDirectory=/srv/jupyter-dashboards/
+User=ubuntu
+Group=ubuntu
+ExecStart=/usr/local/bin/jupyter-kernelgateway --port=8888 --ip=127.0.0.1

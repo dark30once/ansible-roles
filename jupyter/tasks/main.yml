@@ -1,0 +1,131 @@
+---
+# Tasks to install python gunicorn and circus
+#
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Include OS-specific taks
+  include: "{{ ansible_os_family }}.yml"
+
+- name: Ansible service manager
+  debug: var=ansible_service_mgr
+
+- name: NPM fs
+  file:
+      path: "{{ item }}"
+      state: directory
+      owner: root
+      group: root
+      mode: oug+rwx
+  with_items:
+      - /tmp/.npm
+      - /tmp/.npm/_locks
+
+- name: install jupyter-dashboards-server
+  shell: HOME=/tmp/ npm install -g jupyter-dashboards-server
+
+- name: Install python3 packages
+  pip: executable=pip3 name={{ item }} state=present
+  with_items:
+      - virtualenv
+      - virtualenvwrapper
+      - configobj
+      - py-bcrypt
+      - ipython
+      - jupyter-client
+      - jupyter-contrib-core
+      - jupyter-contrib-nbextensions
+      - jupyter-dashboards
+      - jupyter-nbextensions-configurator
+      - jupyter-kernel-gateway
+      - jupyter-declarativewidgets
+      - jupyter-dashboards-bundlers
+      - pandas
+      - numpy
+      - plotly
+      - fuzzywuzzy
+      - simpledbf
+      - pivottablejs
+      - tables
+      - XlsxWriter
+      - xlrd
+
+- name: Install python packages
+  pip: executable=pip name={{ item }} state=present
+  with_items:
+      - virtualenv
+      - virtualenvwrapper
+      - configobj
+      - py-bcrypt
+      - pandas
+      - numpy
+      - plotly
+      - fuzzywuzzy
+      - simpledbf
+      - pivottablejs
+      - tables
+      - XlsxWriter
+      - xlrd
+
+- name: Setup fs
+  file:
+      path: /srv/jupyter-dashboards
+      state: directory
+      owner: ubuntu
+      group: ubuntu
+      mode: 755
+
+- name: Copy upstart service
+  template:
+      src: jupyter-dashboards-server.conf.upstart.j2 
+      dest: /etc/init/jupyter-dashboards-server.conf
+      owner: root
+      group: root
+      mode: 644
+  when: ansible_service_mgr=='upstart'
+
+- name: Copy systemd service
+  template:
+      src: jupyter-dashboards-server.service.systemd.j2 
+      dest: /etc/systemd/system/jupyter-dashboards-server.service
+      owner: root
+      group: root
+      mode: 644
+  when: ansible_service_mgr=='systemd'
+
+- name: Start jupyter dashboards server
+  service:
+      name: jupyter-dashboards-server
+      state: started
+
+- name: Copy kernelgateway upstart service
+  template:
+      src: jupyter-kernelgateway.conf.upstart.j2 
+      dest: /etc/init/jupyter-kernelgateway.conf
+      owner: root
+      group: root
+      mode: 644
+  when: ansible_service_mgr=='upstart'
+
+- name: Copy kernelgateway systemd service
+  template:
+      src: jupyter-kernelgateway.service.systemd.j2 
+      dest: /etc/systemd/system/jupyter-kernelgateway.service
+      owner: root
+      group: root
+      mode: 644
+  when: ansible_service_mgr=='systemd'
+
+- name: Start jupyter kernelgateway
+  service:
+      name: jupyter-kernelgateway
+      state: started
+
+- name: Enable jupyter nbextension contrib
+  shell: jupyter contrib nbextension install --sys-prefix
+
+- name: Enable jupyter dashboards
+  shell: jupyter dashboards quick-setup --sys-prefix
+
+- name: Enable jupyter dashboard bundlers
+  shell: jupyter bundlerextension enable --sys-prefix --py dashboards_bundlers
