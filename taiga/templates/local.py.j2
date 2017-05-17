@@ -15,7 +15,7 @@ DEFAULT_FROM_EMAIL = "{{ taiga_from_email }}"
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 EVENTS_PUSH_BACKEND = "taiga.events.backends.rabbitmq.EventsPushBackend"
-EVENTS_PUSH_BACKEND_OPTIONS = {"url": "amqp://taiga:{{ rabbitmq_password }}}@localhost:5672/taiga"}
+EVENTS_PUSH_BACKEND_OPTIONS = {"url": "amqp://taiga:{{ rabbitmq_password.stdout }}@localhost:5672/taiga"}
 
 # Uncomment and populate with proper connection parameters
 # for enable email sending. EMAIL_HOST_USER should end by @domain.tld

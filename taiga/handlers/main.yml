@@ -8,5 +8,6 @@
   shell: circusctl {{ item }}
   with_items:
     - reloadconfig
-    - restart taiga
+    - start taiga 
     - start taiga-celery
+    - start taiga-events

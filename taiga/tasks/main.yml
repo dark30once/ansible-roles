@@ -166,7 +166,6 @@
 - name: rabbitmqctl set permissions
   shell: rabbitmqctl set_permissions -p taiga taiga ".*" ".*" ".*"
 
-
 - name: setup celery path for conf file
   file: path={{ item.path }} owner='root' group='root' mode=755 state=directory
   with_items:
@@ -176,16 +175,40 @@
 - name: putting taiga celery conf
   template:
     src: taiga-celery.ini.j2
-    dest: /etc/circus/conf.d
+    dest: /etc/circus/conf.d/taiga-celery.ini
   notify: reload circus
 
-- name: editing the conf.json
+- name: editing the conf.json in taiga-front
   template:
-    src: conf.json.j2
+    src: front-conf.json.j2
     dest: "{{ taiga_base_url }}/taiga-front-dist/dist/conf.json"
+
+- name: editing the conf.json in events
+  template:
+    src: events-conf.json.j2
+    dest: "{{ taiga_base_url }}/taiga-events/conf.json"
+
+- name: putting taiga-events.ini 
+  template:
+    src: taiga-events.ini.j2
+    dest: /etc/circus/conf.d/taiga-events.ini
+  notify: reload circus
+
+- name: setup log path for taiga.ini logs
+  file: path={{ item.path }} owner='root' group='root' mode=755 state=directory
+  with_items:
+      - path: "{{ taiga_base_url }}/logs"
+
+- name: putting taiga.ini 
+  template:
+    src: taiga.ini.j2
+    dest: /etc/circus/conf.d/taiga.ini
+  notify: reload circus
 
 - name: putting the local.py
   template:
     src: local.py.j2
     dest: "{{ taiga_base_url }}/taiga-back"
+
+
 
