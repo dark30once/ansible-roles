@@ -3,7 +3,11 @@ Description='Jupyter Dashboards Server'
 
 [Service]
 Type=simple
-Environment="KERNEL_GATEWAY_URL=http://127.0.0.1:8888 NOTEBOOKS_DIR=/srv/jupyter-dashboards/ IP=0.0.0.0 PORT=3000"
+Environment="PUBLIC_LINK_PATTERN=http://{{ servername }}:3000"
+Environment="KERNEL_GATEWAY_URL=http://127.0.0.1:8888"
+Environment="NOTEBOOKS_DIR=/srv/jupyter-dashboards/"
+Environment="IP=0.0.0.0"
+Environment="PORT=3000"
 WorkingDirectory=/srv/jupyter-dashboards/
 User=ubuntu
 Group=ubuntu

@@ -67,13 +67,16 @@
       - XlsxWriter
       - xlrd
 
+- name: Install python packages
+  pip: executable=pip name=ipython version=5.3.0 state=present
+
 - name: Setup fs
   file:
       path: /srv/jupyter-dashboards
       state: directory
       owner: ubuntu
       group: ubuntu
-      mode: 755
+      mode: 0755
 
 - name: Copy upstart service
   template:
@@ -81,7 +84,7 @@
       dest: /etc/init/jupyter-dashboards-server.conf
       owner: root
       group: root
-      mode: 644
+      mode: 0644
   when: ansible_service_mgr=='upstart'
 
 - name: Copy systemd service
@@ -90,12 +93,13 @@
       dest: /etc/systemd/system/jupyter-dashboards-server.service
       owner: root
       group: root
-      mode: 644
+      mode: 0644
   when: ansible_service_mgr=='systemd'
 
 - name: Start jupyter dashboards server
   service:
       name: jupyter-dashboards-server
+      enabled: yes
       state: started
 
 - name: Copy kernelgateway upstart service
@@ -104,7 +108,7 @@
       dest: /etc/init/jupyter-kernelgateway.conf
       owner: root
       group: root
-      mode: 644
+      mode: 0644
   when: ansible_service_mgr=='upstart'
 
 - name: Copy kernelgateway systemd service
@@ -113,12 +117,13 @@
       dest: /etc/systemd/system/jupyter-kernelgateway.service
       owner: root
       group: root
-      mode: 644
+      mode: 0644
   when: ansible_service_mgr=='systemd'
 
 - name: Start jupyter kernelgateway
   service:
       name: jupyter-kernelgateway
+      enabled: yes
       state: started
 
 - name: Enable jupyter nbextension contrib
