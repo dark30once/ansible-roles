@@ -31,9 +31,9 @@ server {
     
     location / {
 {% if item.documentroot is defined %}
-        root {{ item.documentroot }}
+        root {{ item.documentroot }};
 {% endif %}
-{% if item.welcome is defined %}
+{% if item.welcome is defined and item.welcome %}
         try_files $uri $uri/ /noindex/index.html;
 {% else %}
         try_files $uri $uri/ /index.html;
@@ -42,8 +42,8 @@ server {
         return 301 {{ item.redirect }}$request_uri;
 {% endif %}
     }
-#START ANSIBLE MANAGED BLOCK
-#END ANSIBLE MANAGED BLOCK
+# BEGIN ANSIBLE MANAGED BLOCK
+# END ANSIBLE MANAGED BLOCK
 
 
 {% if item.extra_parameters is defined %}

@@ -2,7 +2,7 @@
 # RedHat/CentOS specific tasks
 
 - name: Install apache and php
-  apt: name={{ item }} state=present
+  yum: name={{ item }} state=present
   with_items:
       - httpd
       - php
