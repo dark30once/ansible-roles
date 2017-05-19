@@ -49,6 +49,8 @@
       - tables
       - XlsxWriter
       - xlrd
+      - ipykernel
+      - autopep8
 
 - name: Install python packages
   pip: executable=pip name={{ item }} state=present
@@ -66,6 +68,8 @@
       - tables
       - XlsxWriter
       - xlrd
+      - ipykernel
+      - autopep8
 
 - name: Install python packages
   pip: executable=pip name=ipython version=5.3.0 state=present
