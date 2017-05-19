@@ -27,10 +27,8 @@
       - mysqlclient
       - py-bcrypt
 
-- name: Install circus python packages
-  pip: executable=pip3 name={{ item }} state=present
-  with_items:
-      - circus
+- name: Include circus tasks
+  include: circus.yml
   when: python_run_circus
 
 - name: Install gunicorn python packages

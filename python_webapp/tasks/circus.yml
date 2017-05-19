@@ -1,0 +1,34 @@
+
+
+- name: Install circus python packages
+  pip: executable=pip3 name={{ item }} state=present
+  with_items:
+      - circus
+
+- name: setup circus path for conf file
+  file: path={{ item.path }} owner='root' group='root' mode=0755 state=directory
+  with_items:
+      - path: /etc/circus
+      - path: /etc/circus/conf.d
+
+- name: Copy circus systemd service file
+  copy:
+      src: files/circus.service
+      dest: /etc/systemd/system/circus.service
+      mode: 0644
+      owner: root
+      group: root
+  when: ansible_service_mgr=='systemd'
+
+- name: Copy circus systemd service file
+  copy:
+      src: files/circus.ini
+      dest: /etc/circus/circus.ini
+      mode: 0644
+      owner: root
+      group: root
+
+- name: Start circus
+  service:
+    name: circus
+    state: started
