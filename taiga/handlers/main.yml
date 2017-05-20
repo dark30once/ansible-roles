@@ -4,10 +4,15 @@
       name: postgresql
       state: restarted
 
+- name: restart rabbitmq
+  service:
+      name: rabbitmq-server
+      state: restarted
+
 - name: reload circus
   shell: circusctl {{ item }}
   with_items:
     - reloadconfig
-    - start taiga 
-    - start taiga-celery
-    - start taiga-events
+    - restart taiga 
+    - restart taiga-celery
+    - restart taiga-events

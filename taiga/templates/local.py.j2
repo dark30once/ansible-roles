@@ -5,7 +5,7 @@ STATIC_URL = "{{ taiga_http_scheme }}://{{ taiga_domain }}/static/"
 SITES["front"]["scheme"] = "{{ taiga_http_scheme }}"
 SITES["front"]["domain"] = "{{ taiga_domain }}"
 
-SECRET_KEY = "{{ taiga_secret_key.stdout }}"
+SECRET_KEY = "{{ taiga_secret_key['stdout'] }}"
 
 DEBUG = False
 CELERY_ENABLED = True
@@ -15,7 +15,7 @@ DEFAULT_FROM_EMAIL = "{{ taiga_from_email }}"
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 EVENTS_PUSH_BACKEND = "taiga.events.backends.rabbitmq.EventsPushBackend"
-EVENTS_PUSH_BACKEND_OPTIONS = {"url": "amqp://taiga:{{ rabbitmq_password.stdout }}@localhost:5672/taiga"}
+EVENTS_PUSH_BACKEND_OPTIONS = {"url": "amqp://taiga:{{ rabbitmq_password['stdout'] }}@localhost:5672/taiga"}
 
 # Uncomment and populate with proper connection parameters
 # for enable email sending. EMAIL_HOST_USER should end by @domain.tld
