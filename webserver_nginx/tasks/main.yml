@@ -73,11 +73,20 @@
   file: path={{ item.path }} state=absent
   with_items: '{{ nginx_remove_files }}'
 
+- name: stop nginx
+  service:
+      name: nginx
+      state: stopped
+
 - name: setup lets encrypt SSL
-  shell: certbot certonly --keep -n --nginx -m "{{ item.admin_from_email }}" -d "{{ item.servername }}" --agree-tos
+  shell: certbot certonly --keep -n --standalone -m "{{ item.admin_from_email }}" -d "{{ item.servername }}" --agree-tos
   when: item.use_https is defined and item.use_https
   with_items: "{{ nginx_vhosts }}"
-  notify: restart nginx
+
+- name: start nginx
+  service:
+      name: nginx
+      state: started
 
 - name: setup vhosts
   template:
@@ -98,5 +107,12 @@
   when: nginx_sites_conf_enabled_dir!=nginx_sites_conf_dir
   notify: restart nginx
 
+- debug: var=skip_php
+
+- name: Include OS-specific php tasks
+  include: "{{ ansible_os_family }}.php.yml"
+  when: not skip_php
+
 - name: Include PHP tasks
   include: "php.yml"
+  when: not skip_php

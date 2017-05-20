@@ -28,7 +28,8 @@ server {
     add_header Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";
 
 {% endif %}
-    
+
+{% if item.skiproot is not defined or not item.skiproot %}
     location / {
 {% if item.documentroot is defined %}
         root {{ item.documentroot }};
@@ -42,6 +43,7 @@ server {
         return 301 {{ item.redirect }}$request_uri;
 {% endif %}
     }
+{% endif %}
 # BEGIN ANSIBLE MANAGED BLOCK
 # END ANSIBLE MANAGED BLOCK
 
