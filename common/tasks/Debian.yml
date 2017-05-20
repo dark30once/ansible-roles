@@ -36,12 +36,14 @@
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
     state: "{{ item.state }}"
+  register: locale_changed
   with_items:
     - { regexp: '^#? ?en_US.UTF-8 UTF-8', line: 'en_US.UTF-8 UTF-8', state: present }
     - { regexp: '^#? ?en_PH.UTF-8 UTF-8', line: 'en_PH.UTF-8 UTF-8', state: present }
 
 - name: rebuild locales database
   command: "{{ item }}"
+  when: locale_changed.changed
   with_items:
-    - dpkg-reconfigure locales -f noninteractive
     - /usr/sbin/locale-gen
+    - dpkg-reconfigure locales -f noninteractive
