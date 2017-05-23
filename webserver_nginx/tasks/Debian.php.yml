@@ -3,7 +3,7 @@
 # Debian specific tasks
 
 - name: Add php ppa for php5 for ubuntu
-  apt-repository:
+  apt_repository:
       repo: ppa:ondrej/php
       state: present
   when: ansible_distribution == 'Ubuntu'
