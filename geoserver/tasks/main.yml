@@ -42,13 +42,17 @@
 
 - name: Copy geoserver war
   copy:
-      dest: "{{ tomcat_webapp_dir}}/geoserver.war"
+      dest: "{{ catalina_home }}/{{ item.tomcat_webapp_dir}}/geoserver.war"
       src: files/geoserver.war
+  with_items: tomcat_vhosts
+  when: item.geoserver is defined and item.geoserver
 
 - name: Copy geoexplorer war
   copy:
-      dest: "{{ tomcat_webapp_dir }}/geoexplorer.war"
+      dest: "{{ catalina_home }}/{{ item.tomcat_webapp_dir }}/geoexplorer.war"
       src: files/geoexplorer.war
+  with_items: tomcat_vhosts
+  when: item.geoserver is defined and item.geoserver
 
 - name: copy java jai and jai_imageio
   unarchive:
@@ -60,9 +64,11 @@
 
 - name: remove geoserver bundled jai/jai-imageio
   file: 
-    path: "{{ tomcat_webapp_dir }}/geoserver/WEB-INF/lib/{{ item }}"
+    path: "{{ catalina_home }}/{{ item.tomcat_webapp_dir }}/geoserver/WEB-INF/lib/{{ item }}"
     state: absent
   with_items:
       - jai_codec-1.1.3.jar
       - jai_core-1.1.3.jar
       - jai_imageio-1.1.jar
+  with_items: tomcat_vhosts
+  when: item.geoserver is defined and item.geoserver
