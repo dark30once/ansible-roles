@@ -1,5 +1,5 @@
 ---
 - name: restart tomcat
   service:
-      name: tomcat7
+      name: "{{ tomcat_version }}"
       state: restarted

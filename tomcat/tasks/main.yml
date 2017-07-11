@@ -7,6 +7,17 @@
 - name: Include OS-specific taks
   include: "{{ ansible_os_family }}.yml"
 
+- name: Tomcat vhosts
+  debug: var=tomcat_vhosts
+
+- name: setup fs
+  file:
+      path: "{{ catalina_home }}/{{ item.tomcat_webapp_dir }}"
+      owner: "{{ tomcat_user }}"
+      group: "{{ tomcat_group }}"
+      state: directory
+  with_items: tomcat_vhosts
+
 - name: Modify mod-jk config
   lineinfile: 
       dest: "{{ modjk_workers_file }}"
@@ -23,10 +34,25 @@
       - line: "worker.ajp13_worker.type=ajp13"
         regex: "^#?worker.ajp13_worker.type="
 
+- name: Java options file
+  debug: var=tomcat_java_opts_file
+
+- name: Set tomcat Java options
+  lineinfile:
+    dest: "{{ tomcat_java_opts_file }}"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  notify: restart tomcat
+  with_items:
+      - line: 'JAVA_OPTS="-Djava.awt.headless=true -Xmx1536m -Xms128m -XX:+UseConcMarkSweepGC"'
+        regexp: '^JAVA_OPTS=.*$'
+
 - name: Modify tomcat config
   template:
       dest: "{{ tomcat_server_config_file }}"
       src: tomcat_server.xml.j2
+  notify: restart tomcat
 
 - name: tomcat service state
   service: name="{{ tomcat_version }}" state=started enabled=yes
