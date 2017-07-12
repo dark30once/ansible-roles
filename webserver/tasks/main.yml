@@ -123,3 +123,4 @@
 
 - name: Include PHP tasks
   include: "php.yml"
+  when: not skip_php
