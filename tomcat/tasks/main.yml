@@ -16,7 +16,7 @@
       owner: "{{ tomcat_user }}"
       group: "{{ tomcat_group }}"
       state: directory
-  with_items: tomcat_vhosts
+  with_items: "{{ tomcat_vhosts }}"
 
 - name: Modify mod-jk config
   lineinfile: 
