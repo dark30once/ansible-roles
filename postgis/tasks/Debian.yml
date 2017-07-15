@@ -1,6 +1,24 @@
 ---
 # Debian specific tasks
 
+- name: Add UbuntuGIS Unstable on Ubuntu Xenial
+  apt_repository:
+      repo: ppa:ubuntugis/ubuntugis-unstable
+      state: present
+  when: ansible_distribution_release == "xenial"
+
+- name: Add postgresql repository key
+  apt_key:
+      url: "https://www.postgresql.org/media/keys/ACCC4CF8.asc"
+      state: present
+  when: ansible_distribution_release == "xenial"
+
+- name: Add Postgresql repository on Ubuntu Xenial
+  apt_repository:
+      repo: deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main
+      state: present
+  when: ansible_distribution_release == "xenial"
+
 - name: Install required debian packages
   apt: name={{ item }} state=present update_cache=yes force=yes
   with_items:
