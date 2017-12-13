@@ -1,6 +1,6 @@
 ---
 - name: restart nginx
   service:
-      name: nginx
+      name: "{{ nginx_service_name }}"
       state: restarted
   when: not skip_httpd_restart

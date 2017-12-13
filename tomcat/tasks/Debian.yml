@@ -2,7 +2,7 @@
 # Debian/Ubuntu specific tasks
 
 - name: Webupd8 apt key
-  apt-key:
+  apt_key:
       keyserver: hkp://keyserver.ubuntu.com:80
       id: EEA14886
       state: present
@@ -19,6 +19,12 @@
   apt: name={{ item }} state=present update_cache=yes
   with_items:
       - oracle-java8-installer
-      - tomcat7
+      - "{{ tomcat_version }}"
       - libapache2-mod-jk
       - oracle-java8-unlimited-jce-policy
+
+- name: Symlink default java
+  file: src=/usr/lib/jvm/java-8-oracle dest=/usr/lib/jvm/default-java state=link
+
+- name: Set Tomcat java home
+  lineinfile: dest="/etc/default/{{ tomcat_version }}" regexp="^JAVA_HOME=" line="JAVA_HOME=/usr/lib/jvm/java-8-oracle/" state=present

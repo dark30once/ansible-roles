@@ -1,6 +1,8 @@
 apache_conf_dir: /etc/httpd/conf.d
 apache_module_dir: /etc/httpd/conf.modules.d
+apache_log_dir: /var/log/httpd/
 vhosts_filename: vhosts.conf
+apache_service_name: httpd
 apache_user: apache
 apache_group: apache
 apache_listen_port: 80

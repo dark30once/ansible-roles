@@ -1,0 +1,35 @@
+---
+# Debian specific tasks
+
+- name: Install required debian jessie packages
+  apt: name={{ item }} state=latest default_release=jessie-backports
+  with_items:
+      - python3
+      - python3-setuptools
+      - python3-pip
+      - python3-dev
+      - python
+      - python-setuptools
+      - python-pip
+      - python-dev
+      - nodejs-dev=0.10.*
+      - nodejs=0.10.*
+      - nodejs-legacy=0.10.*
+      - npm
+  when: ansible_distribution_release == "jessie"
+
+- name: Install required debian packages
+  apt: name={{ item }} state=latest
+  with_items:
+      - python3
+      - python3-setuptools
+      - python3-pip
+      - python3-dev
+      - python
+      - python-setuptools
+      - python-pip
+      - python-dev
+      - nodejs
+      - nodejs-legacy
+      - npm
+  when: ansible_distribution_release != "jessie"

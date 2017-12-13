@@ -1,11 +1,233 @@
 ---
 # Tasks to install postgresql
 #
+
 - name: Include OS-specific variables
   include_vars: "{{ ansible_os_family }}.yml"
 
 - name: Include OS-specific taks
   include: "{{ ansible_os_family }}.yml"
 
-- name: postgresql service state
-  service: name=postgresql state=started enabled=yes
+- name: debugging
+  debug: var=nginx_sites_conf_dir
+
+- name: Setup taiga specific nginx stuff
+  blockinfile:
+      dest: "{{ nginx_sites_conf_dir }}/{{ item.servername }}.conf"
+      block: |
+        location /api {
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_pass http://127.0.0.1:8001/api;
+            proxy_redirect off;
+        }
+        location /admin {
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_pass http://127.0.0.1:8001$request_uri;
+            proxy_redirect off;
+        }
+        location /events {
+            proxy_pass http://127.0.0.1:8888/events;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_connect_timeout 7d;
+            proxy_send_timeout 7d;
+            proxy_read_timeout 7d;
+        }
+        location /static {
+            alias "{{ taiga_base_url }}taiga-back/static";
+        }
+        location /media {
+            alias "{{ taiga_base_url }}taiga-back/media";
+        }
+  when: "{{ item.taiga }} is defined and {{ item.taiga }}"  
+  with_items: "{{ nginx_vhosts }}"
+
+- name: Generate taiga secret key
+  shell: "pwgen -s -n 40 1"
+  register: taiga_secret_key
+
+- name: Taiga secret key
+  debug: var=taiga_secret_key
+
+- name: Create postgresql user
+  become_user: postgres 
+  postgresql_user: name=taiga
+
+- name: Create postgresql taiga database
+  become_user: postgres 
+  postgresql_db:
+      name: taiga
+      owner: taiga
+      encoding: UTF-8
+      template: template0
+  register: pg_database_created
+
+- name: pg_database_created
+  debug: var=pg_database_created
+
+- name: setup fs
+  file: path={{ item.path }} owner='root' group='root' mode=0755 state=directory
+  with_items:
+      - path: /srv
+
+- name: Create taiga user
+  user:
+      name: taiga
+      home: "{{ taiga_base_url }}"
+
+- name: what is taiga_base_url
+  debug: var=taiga_base_url
+
+- name: get taiga-back
+  become_user: taiga
+  git:
+      repo: https://github.com/taigaio/taiga-back.git
+      dest: "{{ taiga_base_url }}taiga-back"
+      version: stable
+
+- name: get taiga-front
+  become_user: taiga
+  git:
+      repo: https://github.com/taigaio/taiga-front-dist.git
+      dest: "{{ taiga_base_url }}taiga-front-dist"
+      version: stable
+
+- name: get taiga-events
+  become_user: taiga
+  git:
+      repo: https://github.com/taigaio/taiga-events.git
+      dest: "{{ taiga_base_url }}taiga-events"
+
+- name: virtualenv and requirements
+  pip:
+    virtualenv_python: python3
+    requirements: "{{ taiga_base_url }}taiga-back/requirements.txt"
+    virtualenv: "{{ taiga_base_url }}venv"
+
+- name: populating db with initial basic data
+  become_user: taiga
+  django_manage:
+    command: migrate
+    virtualenv: "{{ taiga_base_url }}venv"
+    app_path: "{{ taiga_base_url }}taiga-back"
+
+- name: populating db with initial user
+  become_user: taiga
+  django_manage:
+    command: loaddata
+    virtualenv: "{{ taiga_base_url }}venv"
+    app_path: "{{ taiga_base_url }}taiga-back"
+    fixtures: initial_user initial_project_templates
+  when: pg_database_created.changed
+
+- name: compile messages
+  become_user: taiga
+  django_manage:
+    command: "{{ item }}"
+    virtualenv: "{{ taiga_base_url }}venv"
+    app_path: "{{ taiga_base_url }}taiga-back"
+  with_items:
+    - collectstatic
+    - compilemessages
+
+- name: collect static
+  become_user: taiga
+  django_manage:
+    command: collectstatic
+    virtualenv: "{{ taiga_base_url }}venv"
+    app_path: "{{ taiga_base_url }}taiga-back"
+
+- name: Install taiga-events dependencies
+  become_user: taiga
+  npm:
+      path: "{{ taiga_base_url }}taiga-events/"
+
+- name: Install npm packages
+  npm: 
+    name: "{{ item }}"
+    global: yes
+  with_items:
+      - coffee-script
+
+- name: adjust rabbitmq node name
+  lineinfile: 
+      dest: /etc/rabbitmq/rabbitmq-env.conf
+      regexp: '^\\w*NODENAME\\w*=.*'
+      line: "NODENAME=rabbit@localhost"
+      state: present
+      create: yes
+
+- name: restart rabbitmq
+  service:
+      name: rabbitmq-server
+      state: restarted
+
+- name: create password for rabbitmq
+  shell: "pwgen -s -n 40 1"
+  register: rabbitmq_password
+
+- name: rabbitmq password
+  debug: var=rabbitmq_password
+
+- name: rabbitmq vhost
+  rabbitmq_vhost:
+      name: taiga
+      state: present
+  notify: restart rabbitmq
+
+- name: rabbitmq user
+  rabbitmq_user:
+      user: taiga
+      password: "{{ rabbitmq_password.stdout }}"
+      permissions: [{'vhost':'taiga','configure_priv':'.*','write_priv':'.*','read_priv':'.*'}]
+      state: present
+      force: yes
+  notify: restart rabbitmq
+
+- name: putting taiga celery conf
+  template:
+    src: taiga-celery.ini.j2
+    dest: /etc/circus/conf.d/taiga-celery.ini
+  notify: reload circus
+
+- name: editing the conf.json in taiga-front
+  template:
+    src: front-conf.json.j2
+    dest: "{{ taiga_base_url }}taiga-front-dist/dist/conf.json"
+
+- name: editing the config.json in events
+  template:
+    src: events-conf.json.j2
+    dest: "{{ taiga_base_url }}taiga-events/config.json"
+
+- name: putting taiga-events.ini 
+  template:
+    src: taiga-events.ini.j2
+    dest: /etc/circus/conf.d/taiga-events.ini
+  notify: reload circus
+
+- name: setup log path for taiga.ini logs
+  file: path={{ item.path }} owner='taiga' group='taiga' mode=0755 state=directory
+  with_items:
+      - path: "{{ taiga_base_url }}logs"
+
+- name: putting taiga.ini 
+  template:
+    src: taiga.ini.j2
+    dest: /etc/circus/conf.d/taiga.ini
+  notify: reload circus
+
+- name: putting the local.py
+  template:
+    src: local.py.j2
+    dest: "{{ taiga_base_url }}taiga-back/local.py"
+
+
+

@@ -7,4 +7,78 @@
 - name: Include OS-specific taks
   include: "{{ ansible_os_family }}.yml"
 
+- debug: var=make_postgis_db
 
+- name: Generate postgis password
+  shell: pwgen -s 20 1
+  register: postgis_pwd
+  when: make_postgis_db
+
+- name: "Postgis password"
+  debug: var=postgis_pwd.stdout
+  when: make_postgis_db
+
+- name: Make postgis geoserver user
+  become_user: postgres
+  postgresql_user: 
+    name: geoserver 
+    password: "{{ postgis_pwd.stdout }}"
+  when: make_postgis_db
+
+- name: Make geoserver db
+  become_user: postgres
+  postgresql_db: name=geoserver owner=geoserver template=template0 encoding=UTF-8
+  when: make_postgis_db
+
+- name: Enable postgresql extension s
+  become_user: postgres
+  postgresql_ext: 
+    name: "{{ item }}"
+    db: geoserver
+  with_items:
+      - postgis
+      - hstore
+  when: make_postgis_db
+
+- name: Copy geoserver war
+  copy:
+      dest: "{{ catalina_home }}/{{ item.tomcat_webapp_dir}}/geoserver.war"
+      src: files/geoserver.war
+  with_items: tomcat_vhosts
+  when: item.geoserver is defined and item.geoserver
+
+- name: Copy geoexplorer war
+  copy:
+      dest: "{{ catalina_home }}/{{ item.tomcat_webapp_dir }}/geoexplorer.war"
+      src: files/geoexplorer.war
+  with_items: tomcat_vhosts
+  when: item.geoserver is defined and item.geoserver
+
+- name: copy java jai and jai_imageio
+  unarchive:
+      src: files/jai_jai-imageio-linux-amd64.tar.gz
+      dest: "{{ jre_dir }}"
+
+- name: Restart tomcat (to deploy wars)
+  service: name={{ tomcat_version }} state=restarted
+
+- name: remove geoserver bundled jai/jai-imageio
+  file: 
+    path: "{{ catalina_home }}/{{ item.tomcat_webapp_dir }}/geoserver/WEB-INF/lib/jai_codec-1.1.3.jar"
+    state: absent
+  with_items: tomcat_vhosts
+  when: item.geoserver is defined and item.geoserver
+
+- name: remove geoserver bundled jai/jai-imageio
+  file: 
+    path: "{{ catalina_home }}/{{ item.tomcat_webapp_dir }}/geoserver/WEB-INF/lib/jai_core-1.1.3.jar"
+    state: absent
+  with_items: tomcat_vhosts
+  when: item.geoserver is defined and item.geoserver
+
+- name: remove geoserver bundled jai/jai-imageio
+  file: 
+    path: "{{ catalina_home }}/{{ item.tomcat_webapp_dir }}/geoserver/WEB-INF/lib/jai_imageio-1.1.jar"
+    state: absent
+  with_items: tomcat_vhosts
+  when: item.geoserver is defined and item.geoserver

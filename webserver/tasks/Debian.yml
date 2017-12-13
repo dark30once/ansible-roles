@@ -1,0 +1,82 @@
+---
+# Debian specific tasks
+
+- name: Add php ppa for php5 for ubuntu
+  apt_repository:
+      repo: ppa:ondrej/php
+      state: present
+  when: ansible_distribution == 'Ubuntu' and not skip_php
+
+- name: Add certbot ppa for ubuntu
+  apt_repository:
+      repo: ppa:certbot/certbot
+      state: present
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Install apache Debian Jessie
+  apt: name={{ item }} state=latest default_release=jessie-backports force=yes
+  with_items:
+      - apache2
+      - python-pkg-resources
+      - python-setuptools
+      - python-cryptography
+      - python-ndg-httpsclient
+      - python-psutil
+      - python-openssl
+      - python-acme
+      - python-certbot
+      - python-certbot-apache
+      - certbot
+  when: ansible_distribution_release == "jessie"
+
+- name: Install apache other Debian
+  apt: name={{ item }} state=latest
+  with_items:
+      - apache2
+      - python-pkg-resources
+      - python-setuptools
+      - python-cryptography
+      - python-ndg-httpsclient
+      - python-psutil
+      - python-openssl
+      - python-acme
+      - python-certbot
+      - python-certbot-apache
+      - certbot
+  when: ansible_distribution_release != "jessie"
+
+- name: Create config files if not existing
+  copy: 
+      dest: '{{ item }}'
+      owner: 'root'
+      group: 'root'
+      mode: 640 
+      force: no
+      content: ""
+  with_items:
+      - '{{ apache_conf_file }}'
+  
+  
+- name: Install php on Debian
+  apt: name={{ item }} state=latest
+  with_items:
+      - php5
+      - php5-gd
+      - libapache2-mod-php5
+      - libapache2-mod-security2
+      - php5-mysql
+      - php5-pgsql
+      - php5-mcrypt
+  when: not skip_php and ansible_distribution != 'Ubuntu'
+
+- name: Install php5 ubuntu
+  apt: name={{ item }} state=latest
+  with_items:
+      - php5.6
+      - php-fpm
+      - php-gd
+      - php-mysql
+      - php-pgsql
+      - php-mcrypt
+  when: ansible_distribution == 'Ubuntu' and not skip_php
+

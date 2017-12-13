@@ -1,15 +1,16 @@
 ---
 # Debian specific tasks
 
-- name: Install nginx and php
+- name: Which distro version
+  debug: var={{ item }}
+  with_items:
+      - ansible_distribution
+      - ansible_distribution_release
+
+- name: Install nginx Jessie
   apt: name={{ item }} state=latest default_release=jessie-backports force=yes
   with_items:
       - nginx-full
-      - php5-fpm
-      - php5-gd
-      - php5-mysql
-      - php5-pgsql
-      - php5-mcrypt
       - python-pkg-resources
       - python-setuptools
       - python-cryptography
@@ -19,18 +20,18 @@
       - python-certbot
       - python-certbot-nginx
       - certbot
-      - postfix
   when: ansible_distribution_release == "jessie"
 
-- name: Install nginx and php
+- name: Add ppa for certbot
+  apt_repository:
+      repo: ppa:certbot/certbot
+      state: present
+  when: ansible_distribution == 'Ubuntu'
+  
+- name: Install nginx Ubuntu
   apt: name={{ item }} state=latest
   with_items:
       - nginx-full
-      - php5-fpm
-      - php5-gd
-      - php5-mysql
-      - php5-pgsql
-      - php5-mcrypt
       - python-pkg-resources
       - python-setuptools
       - python-cryptography
@@ -40,5 +41,19 @@
       - python-certbot
       - python-certbot-nginx
       - certbot
-      - postfix
-  when: ansible_distribution_release != "jessie"
+  when: ansible_distribution == "Ubuntu"
+
+- name: Install nginx rest Debian
+  apt: name={{ item }} state=latest
+  with_items:
+      - nginx-full
+      - python-pkg-resources
+      - python-setuptools
+      - python-cryptography
+      - python-psutil
+      - python-openssl
+      - python-acme
+      - python-certbot
+      - python-certbot-nginx
+      - certbot
+  when: ansible_distribution_release != "jessie" and ansible_distribution != "Ubuntu"

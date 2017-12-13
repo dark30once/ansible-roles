@@ -1,0 +1,7 @@
+{
+    "url": "amqp://taiga:{{ rabbitmq_password.stdout }}@localhost:5672/taiga",
+    "secret": "{{ taiga_secret_key.stdout }}",
+    "webSocketServer": {
+        "port": 8888
+    }
+}

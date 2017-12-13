@@ -8,6 +8,9 @@
       - php
       - php-gd
       - mod_security
+      - php5-mysql
+      - php5-pgsql
+      - php5-mcrypt
       - mod_ssl
       - epel-release
       - certbot

@@ -1,0 +1,15 @@
+{
+    "api": "{{ taiga_http_scheme }}://{{ taiga_domain }}/api/v1/",
+    {%if taiga_http_scheme == "http"%}
+    "eventsUrl": "ws://{{ taiga_domain }}/events",
+    {% else %}
+   	"eventsUrl": "wss://{{ taiga_domain }}/events",
+    {% endif %}
+    "debug": "true",
+    "publicRegisterEnabled": true,
+    "feedbackEnabled": true,
+    "privacyPolicyUrl": null,
+    "termsOfServiceUrl": null,
+    "maxUploadFileSize": null,
+    "contribPlugins": []
+}

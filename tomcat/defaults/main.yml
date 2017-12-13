@@ -1,0 +1,6 @@
+tomcat_version: tomcat8
+tomcat_java_opts_file: /etc/default/{{ tomcat_version }}
+tomcat_server_config_file: /etc/{{ tomcat_version }}/server.xml
+catalina_home: /var/lib/{{ tomcat_version }}/
+tomcat_user: tomcat8
+tomcat_group: tomcat8

@@ -1,0 +1,40 @@
+
+---
+# Debian specific tasks
+
+- name: Add php ppa for php5 for ubuntu
+  apt_repository:
+      repo: ppa:ondrej/php
+      state: present
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Install php5 ubuntu
+  apt: name={{ item }} state=latest
+  with_items:
+      - php5.6
+      - php-fpm
+      - php-gd
+      - php-mysql
+      - php-pgsql
+      - php-mcrypt
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Install php5 jessie
+  apt: name={{ item }} state=latest default_release=jessie-backports force=yes
+  with_items:
+      - php5-fpm
+      - php5-gd
+      - php5-mysql
+      - php5-pgsql
+      - php5-mcrypt
+  when: ansible_distribution_release == "jessie"
+
+- name: Install php5 rest debian
+  apt: name={{ item }} state=latest
+  with_items:
+      - php5-fpm
+      - php5-gd
+      - php5-mysql
+      - php5-pgsql
+      - php5-mcrypt
+  when: ansible_distribution_release != "jessie" and ansible_distribution != 'Ubuntu'

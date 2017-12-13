@@ -1,0 +1,164 @@
+---
+# Tasks to install python gunicorn and circus
+#
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Include OS-specific taks
+  include: "{{ ansible_os_family }}.yml"
+
+- name: Ansible service manager
+  debug: var=ansible_service_mgr
+
+- name: NPM fs
+  file:
+      path: "{{ item }}"
+      state: directory
+      owner: root
+      group: root
+      mode: oug+rwx
+  with_items:
+      - /tmp/.npm
+      - /tmp/.npm/_locks
+
+- name: install jupyter-dashboards-server
+  shell: HOME=/tmp/ npm install -g jupyter-dashboards-server
+
+- name: Install python3 packages
+  pip: executable=pip3 name={{ item }} state=present
+  with_items:
+      - virtualenv
+      - virtualenvwrapper
+      - configobj
+      - py-bcrypt
+      - ipython
+      - jupyter-client
+      - jupyter-contrib-core
+      - jupyter-contrib-nbextensions
+      - jupyter-dashboards
+      - jupyter-nbextensions-configurator
+      - jupyter-kernel-gateway
+      - jupyter-declarativewidgets
+      - jupyter-dashboards-bundlers
+      - pandas
+      - numpy
+      - plotly
+      - fuzzywuzzy
+      - simpledbf
+      - pivottablejs
+      - tables
+      - XlsxWriter
+      - xlrd
+      - ipykernel
+      - autopep8
+
+- name: Install python packages
+  pip: executable=pip name={{ item }} state=present
+  with_items:
+      - virtualenv
+      - virtualenvwrapper
+      - configobj
+      - py-bcrypt
+      - pandas
+      - numpy
+      - plotly
+      - fuzzywuzzy
+      - simpledbf
+      - pivottablejs
+      - tables
+      - XlsxWriter
+      - xlrd
+      - ipykernel
+      - autopep8
+
+- name: Install python packages
+  pip: executable=pip name=ipython version=5.3.0 state=present
+
+- name: Setup fs
+  file:
+      path: /srv/jupyter-dashboards
+      state: directory
+      owner: ubuntu
+      group: ubuntu
+      mode: 0755
+
+- name: Copy upstart service
+  template:
+      src: jupyter-dashboards-server.conf.upstart.j2 
+      dest: /etc/init/jupyter-dashboards-server.conf
+      owner: root
+      group: root
+      mode: 0644
+  when: ansible_service_mgr=='upstart'
+
+- name: Copy systemd service
+  template:
+      src: jupyter-dashboards-server.service.systemd.j2 
+      dest: /etc/systemd/system/jupyter-dashboards-server.service
+      owner: root
+      group: root
+      mode: 0644
+  when: ansible_service_mgr=='systemd'
+
+- name: Start jupyter dashboards server
+  service:
+      name: jupyter-dashboards-server
+      enabled: yes
+      state: started
+
+- name: Copy kernelgateway upstart service
+  template:
+      src: jupyter-kernelgateway.conf.upstart.j2 
+      dest: /etc/init/jupyter-kernelgateway.conf
+      owner: root
+      group: root
+      mode: 0644
+  when: ansible_service_mgr=='upstart'
+
+- name: Copy kernelgateway systemd service
+  template:
+      src: jupyter-kernelgateway.service.systemd.j2 
+      dest: /etc/systemd/system/jupyter-kernelgateway.service
+      owner: root
+      group: root
+      mode: 0644
+  when: ansible_service_mgr=='systemd'
+
+- name: Start jupyter kernelgateway
+  service:
+      name: jupyter-kernelgateway
+      enabled: yes
+      state: started
+
+- name: Enable jupyter nbextension contrib
+  shell: jupyter contrib nbextension install --sys-prefix
+
+- name: Enable jupyter dashboards
+  shell: jupyter dashboards quick-setup --sys-prefix
+
+- name: Enable jupyter dashboard bundlers
+  shell: jupyter bundlerextension enable --sys-prefix --py dashboards_bundlers
+
+- name: Setup nginx reverse proxy
+  blockinfile:
+      dest: "{{ nginx_sites_conf_dir }}/{{ item.servername }}.conf"
+      block: |
+        location / {
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_pass http://127.0.0.1:3000/;
+            proxy_redirect off;
+        }
+        location /api/kernels {
+            proxy_pass http://127.0.0.1:3000/api/kernels;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_connect_timeout 7d;
+            proxy_send_timeout 7d;
+            proxy_read_timeout 7d;
+        }
+  when: "{{ item.jupyter }} is defined and {{ item.jupyter }}"  
+  with_items: "{{ nginx_vhosts }}"

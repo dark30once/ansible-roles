@@ -1,0 +1,68 @@
+server {
+{% if item.use_https %}
+    listen 443 ssl;
+{% else %}
+    listen 80;
+{% endif %}
+    server_name {{ item.servername }}{% if item.serveralias is defined %} {{ item.serveralias }}{% endif %};
+
+    large_client_header_buffers 4 32k;
+    client_max_body_size 50M;
+    charset utf-8;
+
+    access_log {{ nginx_log_dir }}/{{ item.servername }}.access.log;
+    error_log {{ nginx_log_dir }}/{{ item.servername }}.error.log;
+
+
+{% if item.use_https %}
+    ssl on;
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_prefer_server_ciphers on;
+    ssl_ciphers "EECDH+ECDSA+AESGCM:EECDH+aRSA+AESGCM:EECDH+ECDSA+SHA384:EECDH+ECDSA+SHA256:EECDH+aRSA+SHA384:EECDH+aRSA+SHA256:EECDH:EDH+aRSA:!aNULL:!eNULL:!LOW:!MEDIUM:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS:!RC4";
+    ssl_certificate /etc/letsencrypt/live/{{ item.servername }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ item.servername }}/privkey.pem;
+    ssl_session_cache shared:SSL:10m;
+    ssl_stapling on;
+    ssl_stapling_verify on;
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";
+
+{% endif %}
+
+{% if item.skiproot is not defined or not item.skiproot %}
+    location / {
+{% if item.documentroot is defined %}
+        root {{ item.documentroot }};
+{% endif %}
+{% if item.welcome is defined and item.welcome %}
+        try_files $uri $uri/ /noindex/index.html;
+{% else %}
+        try_files $uri $uri/ /index.html;
+{% endif %}
+{% if item.redirect is defined %}
+        return 301 {{ item.redirect }}$request_uri;
+{% endif %}
+    }
+{% endif %}
+# BEGIN ANSIBLE MANAGED BLOCK
+# END ANSIBLE MANAGED BLOCK
+
+
+{% if item.extra_parameters is defined %}
+    {{ item.extra_parameters }}
+{% endif %}
+}
+
+{% if item.use_https %}
+server{
+    listen 80;
+    server_name {{ item.servername }}{% if item.serveralias is defined %} {{ item.serveralias }}{% endif %};
+    location / {
+{% if item.documentroot is defined %}
+        root {{ item.documentroot }}
+{% endif %}
+        return 301 https://$server_name$request_uri;
+    }
+}
+{% endif %}
+

@@ -8,7 +8,7 @@
   include: "{{ ansible_os_family }}.yml"
 
 - name: http service state
-  service: name=httpd state=started enabled=yes
+  service: name="{{ apache_service_name }}" state=started enabled=yes
   when: not skip_httpd_restart
 
 - name: setup fs
@@ -44,31 +44,83 @@
       line: "ServerSignature Off"
   notify: restart apache
 
+- name: Enable apache security conf on Debian
+  file: dest="{{ apache_conf_enabled_file }}" src="{{ apache_conf_file }}" state=link
+  when: ansible_os_family=="Debian"
+  notify: restart apache
+
+- name: Show vhost config
+  debug: var=apache_vhosts
+
 - name: setup docroots
   file: path={{ item.documentroot }} owner='{{apache_user}}' group='{{apache_group}}' mode=755 state=directory
-  with_items: '{{apache_vhosts}}'
+  with_items: '{{ apache_vhosts }}'
 
-- name: copy noindex
-  copy: src=files/noindex dest={{ item.documentroot }}/ owner='{{apache_user}}' group='{{apache_group}}' mode=755
-  with_items: '{{apache_vhosts}}'
-  when: item.welcome is defined
+- name: enable apache modules
+  apache2_module: 
+      name: "{{ item }}"
+      state: present
+  with_items:
+      - ssl
+      - rewrite
+
+- name: disable apache modules
+  apache2_module:
+      name: "{{ item }}"
+      state: present
+  with_items:
+      - cgi
+      - proxy
+
+- name: sync noindex
+  synchronize: src=files/noindex dest={{ item.documentroot }}
+  when: item.welcome is defined and item.welcome
+  with_items: '{{ apache_vhosts }}'
+
+- name: set noindex perms
+  file: recurse=yes path={{ item.documentroot }}  owner='{{apache_user}}' group='{{apache_group}}' mode=755
+  when: item.welcome is defined and item.welcome
+  with_items: '{{ apache_vhosts }}'
+
+- name: sync noindex default docroot
+  synchronize: src=files/noindex/ dest={{ default_docroot }}/
+  with_items: '{{ apache_vhosts }}'
+  when: default_docroot is defined
+
+- name: set default docroot perms
+  file: recurse=yes path={{ item.documentroot }}/ owner='{{apache_user}}' group='{{apache_group}}' mode=755
+  when: item.welcome is defined and item.welcome
+  with_items: '{{ apache_vhosts }}'
 
 - name: remove defaultconf
   file: path={{ item.path }} state=absent
-  with_items: '{{apache_remove_files}}'
+  with_items: '{{ apache_remove_files }}'
+
+- name: setup lets encrypt SSL
+  shell: certbot certonly --keep -n --apache -m "{{ item.admin_from_email }}" -d "{{ item.servername }}" --agree-tos
+  when: item.use_https is defined and item.use_https
+  with_items: "{{ apache_vhosts }}"
+  notify: restart apache
 
 - name: setup vhosts
   template:
       src: "vhosts.conf.j2"
-      dest: "{{ apache_conf_dir }}/{{ vhosts_filename }}"
+      dest: "{{ apache_sites_conf_dir }}/{{ item.servername }}.conf"
       owner: root
       group: root
       mode: 0644
+  with_items: "{{ apache_vhosts }}"
+  notify: restart apache
+
+- name: enable vhost config
+  file: 
+      dest: "{{ apache_sites_conf_enabled_dir }}/{{ item.servername }}.conf"
+      src: "{{ apache_sites_conf_dir }}/{{ item.servername }}.conf"
+      state: link
+  with_items: "{{ apache_vhosts }}"
+  when: ansible_os_family=='Debian'
   notify: restart apache
 
 - name: Include PHP tasks
   include: "php.yml"
-
-- name: Include postfix tasks
-  include: "postfix.yml"
-
+  when: not skip_php

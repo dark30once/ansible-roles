@@ -1,0 +1,12 @@
+
+---
+# RedHat/CentOS specific tasks
+
+- name: Install php
+  yum: name={{ item }} state=present
+  with_items:
+      - php
+      - php-fpm
+      - php-gd
+      - php-pgsql
+      - php-mysql
