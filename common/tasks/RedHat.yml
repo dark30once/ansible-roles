@@ -9,8 +9,12 @@
         state: absent
       - name: epel
         description: EPEL YUM repo
-        url: http://dl.fedoraproject.org/pub/epel/7/x86_64/
+        url: http://mirror.rise.ph/fedora-epel/7/x86_64/
+        gpgkey: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
         state: present
+
+- name: epel gpg keys
+  yum: name=epel-release state=present
 
 - name: install selinux software
   yum: name={{ item }} state=present
