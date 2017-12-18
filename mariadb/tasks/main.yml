@@ -1,0 +1,11 @@
+---
+# Tasks to install postgresql
+#
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Include OS-specific taks
+  include: "{{ ansible_os_family }}.yml"
+
+- name: mariadb service state
+  service: name=mariadb state=started enabled=yes

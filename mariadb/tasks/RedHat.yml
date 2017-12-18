@@ -1,0 +1,9 @@
+---
+# RedHat/Centos specific tasks
+
+- name: Install required redhat packages
+  yum: name={{ item }} state=present update_cache=yes
+  with_items:
+      - mariadb
+      - mariadb-server
+      - phpMyAdmin

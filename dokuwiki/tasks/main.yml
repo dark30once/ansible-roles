@@ -24,12 +24,12 @@
   register: tar_files  
 
 - name: set new_dokuwiki_version
-  shell: grep -o "^[0-9\-]\+" "{{ vhost_path }}/{{ tar_files['files'][0] }}/VERSION"
+  shell: grep -o "^[0-9[a-z\-]\+" "{{ vhost_path }}/{{ tar_files['files'][0] }}/VERSION"
   register: new_dokuwiki_version
   when: tar_files.files is defined
 
 - name: set old_dokuwiki_version
-  shell: grep -o "^[0-9\-]\+" "{{ dokuwiki_path }}/VERSION"
+  shell: grep -o "^[0-9a-z\-]\+" "{{ dokuwiki_path }}/VERSION"
   register: old_dokuwiki_version
 
 - debug: msg='old version {{ old_dokuwiki_version.stdout }} new version {{ new_dokuwiki_version.stdout }}'
