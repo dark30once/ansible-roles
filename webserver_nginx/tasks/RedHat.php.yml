@@ -10,3 +10,4 @@
       - php-gd
       - php-pgsql
       - php-mysql
+      - phpmyadmin

@@ -1,0 +1,13 @@
+---
+# Debian specific tasks
+
+- name: Install nagios Jessie
+  apt: name={{ item }} state=latest
+  with_items:
+      - python-passlib
+      - fcgiwrap
+      - nagios3
+      - nagios3-cgi
+      - nagios-snmp-plugins
+      - nagios-plugins-rabbitmq
+  when: ansible_distribution_release == "jessie"

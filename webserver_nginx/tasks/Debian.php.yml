@@ -17,6 +17,7 @@
       - php-mysql
       - php-pgsql
       - php-mcrypt
+      - phpmyadmin
   when: ansible_distribution == 'Ubuntu'
 
 - name: Install php5 jessie
@@ -27,6 +28,7 @@
       - php5-mysql
       - php5-pgsql
       - php5-mcrypt
+      - phpmyadmin
   when: ansible_distribution_release == "jessie"
 
 - name: Install php5 rest debian
@@ -37,4 +39,5 @@
       - php5-mysql
       - php5-pgsql
       - php5-mcrypt
+      - phpmyadmin
   when: ansible_distribution_release != "jessie" and ansible_distribution != 'Ubuntu'

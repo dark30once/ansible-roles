@@ -9,11 +9,11 @@
   with_items:
       - postfix
 
-- name: set postfix main.cf options
-  lineinfile: dest="{{ postfix_conf_dir }}/main.cf" regexp="{{ item.regexp }}" line="{{ item.line }}" state=present
+- name: set postfix options
+  lineinfile: dest="{{ postfix_conf_dir }}/main.cf" regexp={{ item.regexp }} line={{ item.line }} state=present
   with_items:
-      - regexp: "^#?relayhost" 
-        line: "relayhost = {{ postfix_relay_host }}"
+    - regexp: "^#?relayhost" 
+      line: "relayhost = {{ postfix_relay_host }}"
 
 - name: absent virtual alias domains
   lineinfile:  dest="{{ postfix_conf_dir }}/main.cf" regexp="{{ item.regexp }}" state=absent

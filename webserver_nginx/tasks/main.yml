@@ -64,6 +64,11 @@
   with_items: '{{ nginx_vhosts }}'
   when: default_docroot is defined
 
+- name: set docroot fs
+  file: path="{{ item.documentroot }}/" owner="{{ nginx_user }}" group="{{ nginx_group }}" mode="0755" state="directory"
+  when: item.documentroot is defined
+  with_items: "{{ nginx_vhosts }}"
+
 - name: set default docroot perms
   file: recurse=yes path={{ default_docroot }}/ owner='{{nginx_user}}' group='{{nginx_group}}' mode=755
   when: item.welcome is defined and item.welcome
@@ -111,8 +116,8 @@
 
 - name: Include OS-specific php tasks
   include: "{{ ansible_os_family }}.php.yml"
-  when: not skip_php
+  when: (skip_php == 'false')
 
 - name: Include PHP tasks
   include: "php.yml"
-  when: not skip_php
+  when: (skip_php == 'false')

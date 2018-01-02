@@ -1,0 +1,48 @@
+---
+# Tasks to install postgresql
+#
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Include OS-specific taks
+  include: "{{ ansible_os_family }}.yml"
+
+- name: Set nagios url path
+  lineinfile:
+      dest: "{{ nagios_cgi_path }}"
+      regexp: "^.*url_html_path=.*$"
+      line: "url_html_path=/"
+      state: present
+
+- set_fact:
+    vhost_block: "{{ lookup('template', 'templates/nagios_vhost_block.js') }}"
+
+- name: Generate passwords and salts
+  shell: "pwgen -s -n 10 1"
+  register: passwords
+  with_items: "{{ nginx_vhosts }}"
+  when: item.nagios is defined and item.nagios
+
+- name: Show password
+  debug:
+      msg: "password: '{{ item.stdout }}'"
+  with_items: "{{ passwords.results }}"
+
+- name: Setup nginx
+  blockinfile:
+      dest: "{{ nginx_sites_conf_dir }}/{{ item.servername }}.conf"
+      marker: "# {mark} ANSIBLE MANAGED BLOCK"
+      content: "{{ vhost_block }}"
+      state: present
+  with_items: "{{ nginx_vhosts }}"
+  when: item.nagios is defined and item.nagios
+
+- name: Create htpassword files
+  htpasswd:
+      create: yes
+      path: /etc/nagios3/htpasswd.users
+      name: nagiosadmin
+      password: "{{ item.stdout }}"
+      state: present
+  with_items: "{{ passwords.results }}"
+  when: item.item.nagios is defined and item.item.nagios

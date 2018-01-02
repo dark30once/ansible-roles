@@ -1,5 +1,14 @@
 ---
 
+- name: Setup apt cache proxy
+  lineinfile:
+      dest: /etc/apt/apt.conf.d/02proxy
+      regexp: '^Acquire::http::Proxy.*'
+      line: 'Acquire::http::Proxy "{{ apt_cache_url }}";'
+      state: present
+      create: yes
+  when: apt_cache_url is defined
+
 - name: Enable Jessie-Backports
   apt_repository:
       repo: deb http://httpredir.debian.org/debian jessie-backports main
