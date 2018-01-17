@@ -10,8 +10,8 @@ server {
     client_max_body_size 50M;
     charset utf-8;
 
-    access_log {{ nginx_log_dir }}/{{ item.servername }}.access.log;
-    error_log {{ nginx_log_dir }}/{{ item.servername }}.error.log;
+    access_log {{ nginx_log_dir }}{{ item.servername }}.access.log;
+    error_log {{ nginx_log_dir }}{{ item.servername }}.error.log;
 
 
 {% if item.use_https %}

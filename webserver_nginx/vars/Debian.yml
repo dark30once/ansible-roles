@@ -5,6 +5,7 @@ nginx_listen_port: 80
 nginx_listen_https_port: 443
 nginx_conf_file: "{{nginx_conf_dir}}/01_secure.conf"
 php_conf_file: "/etc/php5/fpm/conf.d/php.ini"
+nginx_snippets_dir: /etc/nginx/snippets
 nginx_module_dir: /etc/nginx/modules-available
 nginx_module_enabled_dir: /etc/nginx/modules-enabled
 nginx_conf_enabled_dir: /etc/nginx/conf.d

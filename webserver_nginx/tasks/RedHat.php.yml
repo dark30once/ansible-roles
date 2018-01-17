@@ -2,12 +2,35 @@
 ---
 # RedHat/CentOS specific tasks
 
+- name: Add Webstatic EL yum repos
+  yum: 
+    name: https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
+    state: present
+  when: ansible_distribution == "CentOS" and ansible_distribution_version | version_compare("6", ">=")
+
+- name: Install php CentOS
+  yum: name={{ item }} state=present
+  with_items:
+      - php56w
+      - php56w-fpm
+      - php56w-gd
+      - php56w-opcache
+      - php56w-mysqlnd
+      - php56w-pear
+      - php56w-pgsql
+      - php56w-mcrypt
+      - phpMyAdmin
+  when: ansible_distribution == "CentOS" and ansible_distribution_version | version_compare("6", ">=")
+
 - name: Install php
   yum: name={{ item }} state=present
   with_items:
       - php
       - php-fpm
       - php-gd
+      - php-mysqlnd
+      - php-pear
       - php-pgsql
-      - php-mysql
-      - phpmyadmin
+      - php-mcrypt
+      - phpMyAdmin
+  when: ansible_distribution != "CentOS"
