@@ -1,9 +1,28 @@
 ---
 # RedHat/Centos specific tasks
 
+- name: setup yum mariadb 10.2 repos for centos7
+  yum_repository: name="{{ item.name }}" description="{{ item.description }}" baseurl="{{ item.url }}" state="{{ item.state }}"
+  with_items:
+      - name: mariadb
+        description: mariadb repo
+        url: http://yum.mariadb.org/10.2/centos7-amd64/
+        gpgkey: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+        state: present
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
+
+- name: Install required centos7 packages
+  yum: name={{ item }} state=latest update_cache=yes
+  with_items:
+      - MariaDB-client
+      - MariaDB-server
+      - MySQL-python
+  when: ansible_distribution == "CentOS" or ansible_distribution_major_version == "7"
+
 - name: Install required redhat packages
-  yum: name={{ item }} state=present update_cache=yes
+  yum: name={{ item }} state=latest update_cache=yes
   with_items:
       - mariadb
       - mariadb-server
       - MySQL-python
+  when: ansible_distribution != "CentOS" or ansible_distribution_major_version != "7"
