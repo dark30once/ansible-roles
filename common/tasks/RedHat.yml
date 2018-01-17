@@ -1,7 +1,13 @@
 ---
 
+- name: epel gpg keys
+  yum: name=epel-release state=present
+
+- name: RPM import gpg keys
+  shell: rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-*
+
 - name: setup_yum_repos
-  yum_repository: name={{item.name}} description={{item.description}} baseurl={{item.url}} state={{item.state}}
+  yum_repository: name="{{ item.name }}" description="{{ item.description }}" baseurl="{{ item.url }}" state="{{ item.state }}"
   with_items:
       - name: foundationu
         description: Foundation University mirro
@@ -13,11 +19,8 @@
         gpgkey: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
         state: present
 
-- name: epel gpg keys
-  yum: name=epel-release state=present
-
 - name: install selinux software
-  yum: name={{ item }} state=present
+  yum: name="{{ item }}" state=present
   with_items:
       - setroubleshoot-server
       - policycoreutils-python
@@ -27,8 +30,9 @@
   yum: name=* state=latest update_cache=yes
 
 - name: Install basic packages
-  yum: name={{ item }} state=present update_cache=yes
+  yum: name="{{ item }}" state=latest
   with_items:
+      - unzip
       - git
       - ntp
       - vim
