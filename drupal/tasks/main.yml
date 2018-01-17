@@ -1,0 +1,142 @@
+---
+# Tasks to install postgresql
+#
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Include OS-specific taks
+  include: "{{ ansible_os_family }}.yml"
+
+- name: Check if Composer is installed.
+  stat: "path={{ composer_path }}"
+  register: composer_bin
+
+- set_fact:
+    vhost_block: "{{ lookup('template', 'templates/drupal_vhost_block.j2') }}"
+  with_items: "{{ nginx_vhosts }}"
+  when: item.drupal is defined and item.drupal
+
+- name: Download composer
+  get_url:
+      url: https://getcomposer.org/installer
+      dest: /tmp/composer-installer.php
+      mode: 0755
+  when: not composer_bin.stat.exists
+
+
+- name: Install composer
+  shell: >
+    {{ php_executable }} {{ php_exec_options }} composer-installer.php
+    chdir=/tmp
+  when: not composer_bin.stat.exists
+
+
+- name: Move composer executable
+  shell: >
+    mv /tmp/composer.phar "{{ composer_path }}"
+    creates="{{ composer_path }}"
+  when: not composer_bin.stat.exists
+
+- name: Make composer cache dir
+  file:
+      path: /var/www/.composer
+      state: directory
+      owner: "{{ http_user }}"
+      group: "{{ http_group }}"
+      mode: 0775
+
+- name: Set composer global config timeout
+  shell: "{{ composer_path }} config --global process-timeout 40000"
+  become: true
+  become_method: sudo
+  become_user: "{{ http_user }}"
+
+- name: Clone composer repos
+  git:
+      repo: "{{ item.composer_repos }}"
+      dest: "{{ item.documentroot }}"
+  with_items: "{{ nginx_vhosts }}"
+  when: item.drupal is defined and item.drupal
+
+- name: Run composer install
+  shell: >
+    {{ php_executable }} {{ php_exec_options }} {{ composer_path }} install
+    chdir="{{item.documentroot}}"
+  become: true
+  become_method: sudo
+  become_user: "{{ http_user }}"
+  with_items: "{{ nginx_vhosts }}"
+  when: item.drupal is defined and item.drupal
+
+- name: Generate passwords and salts
+  shell: "pwgen -s -n 40 1;pwgen -s -n 100 1"
+  register: passwords
+  with_items: "{{ nginx_vhosts }}"
+  when: item.drupal is defined and item.drupal
+
+
+- name: Setup mysql database
+  mysql_db:
+      name: "{{ item.server_machine_name }}"
+      state: present
+      login_user: root
+  become: true
+  become_method: sudo
+  become_user: mysql
+  register: mysql_db_created
+  with_items: "{{ nginx_vhosts }}"
+  when: item.drupal is defined and item.drupal
+
+- name: Setup mysql user
+  mysql_user:
+      name: "{{ item.item.server_machine_name }}"
+      password: "{{ item.stdout.split('\n')[0] }}"
+      login_user: root
+      state: present
+      priv: "{{ item.item.server_machine_name }}.*:ALL"
+      update_password: always
+  become: true
+  become_method: sudo
+  become_user: mysql
+  with_items: "{{ passwords.results }}"
+  when: item.item.drupal is defined and item.item.drupal
+
+- name: "Setup drupal config"
+  template:
+      src: "settings.php.j2"
+      dest: "{{ item.item.documentroot }}web/sites/default/settings.php"
+      owner: "{{ http_user }}"
+      group: "{{ http_group }}"
+      mode: 0444
+  with_items: "{{ passwords.results }}"
+  when: item.item.drupal is defined and item.item.drupal
+
+- name: Setup nginx
+  blockinfile:
+      dest: "{{ nginx_sites_conf_dir }}/{{ item.servername }}.conf"
+      marker: "# {mark} ANSIBLE MANAGED BLOCK"
+      content: "{{ vhost_block }}"
+      state: present
+  with_items: "{{ nginx_vhosts }}"
+  when: item.drupal is defined and item.drupal
+  notify: restart nginx
+
+- name: Create drupal config sync folder
+  file:
+      path: "{{ item.documentroot }}config/sync"
+      state: directory
+      owner: "{{ http_user }}"
+      group: "{{ http_group }}"
+      mode: 0750
+  with_items: "{{ nginx_vhosts }}"
+  when: item.drupal is defined and item.drupal
+
+- name: Change document root
+  lineinfile:
+      dest: "{{ nginx_sites_conf_dir }}/{{ item.servername }}.conf"
+      regexp: '^(\s*)root.*$'
+      backrefs: yes
+      line: '\1root {{ item.documentroot }}web;'
+      state: present
+  with_items: "{{ nginx_vhosts }}"
+  notify: restart nginx
