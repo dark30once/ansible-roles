@@ -33,6 +33,7 @@
   yum: name="{{ item }}" state=latest
   with_items:
       - unzip
+      - patch
       - git
       - ntp
       - vim
