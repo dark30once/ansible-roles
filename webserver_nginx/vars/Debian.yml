@@ -6,8 +6,8 @@ nginx_listen_https_port: 443
 nginx_conf_file: "{{nginx_conf_dir}}/01_secure.conf"
 php_conf_file: "/etc/php5/fpm/conf.d/php.ini"
 php_fpm_socket: "/var/run/php5-fpm.sock"
-php_www_conf_file: "/etc/php/5.0/fpm/pool.d/www.conf"
-php_service_name: php-fpm
+php_www_conf_file: "/etc/php5/fpm/pool.d/www.conf"
+php_service_name: php5-fpm
 nginx_snippets_dir: /etc/nginx/snippets
 nginx_module_dir: /etc/nginx/modules-available
 nginx_module_enabled_dir: /etc/nginx/modules-enabled

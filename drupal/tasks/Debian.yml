@@ -7,13 +7,13 @@
       - php-ldap
   when: ansible_distribution == 'Ubuntu'
 
-  - name: Install php-ldap jessie
+- name: Install php-ldap jessie
   apt: name={{ item }} state=latest default_release=jessie-backports force=yes
   with_items:
       - php5-ldap
   when: ansible_distribution_release == "jessie"
 
-  - name: Install php-ldap rest debian
+- name: Install php-ldap rest debian
   apt: name={{ item }} state=latest
   with_items:
       - php5-ldap
