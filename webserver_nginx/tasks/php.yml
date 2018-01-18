@@ -20,6 +20,21 @@
         section: 'PHP'
   notify: restart nginx
 
+- name: setup php-fpm socket
+  lineinfile:
+      dest: "{{ php_www_conf_file }}"
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+      state: present
+  with_items:
+      - regexp: "^listen\ =.*$"
+        line: "listen = {{ php_fpm_socket }}"
+      - regexp: "^listen.owner\ =.*$"
+        line: "listen.owner = {{ nginx_user }}"
+      - regexp: "^listen.group\ =.*$"
+        line: "listen.owner = {{ nginx_group }}"
+  notify: restart php
+
 - name: Copy phpmyadmin
   template:
       dest: "{{ nginx_snippets_dir }}/phpmyadmin.conf"
@@ -27,3 +42,7 @@
       owner: "{{  nginx_user }}"
       group: "{{ nginx_group }}"
   notify: restart nginx
+
+- name: php service service state
+  service: name="{{ php_service_name }}" state=started enabled=yes
+

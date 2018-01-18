@@ -1,17 +1,18 @@
     location /phpmyadmin {
-           root /usr/share/;
-           index index.php index.html index.htm;
-           location ~ ^/phpmyadmin/(.+\.php)$ {
-                   try_files $uri =404;
-           fastcgi_pass unix:/var/run/php5-fpm.sock;
-                   fastcgi_index index.php;
-           fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-           fastcgi_param PATH_INFO $fastcgi_path_info;
-           fastcgi_param QUERY_STRING $query_string;
-                   include fastcgi_params;
-           }   
+        alias {{ phpmyadmin_dir }}/;    
+        index index.php index.html index.htm;
+    }
+    location ~ ^/phpmyadmin/(.+\.php)$ {
+        alias {{ phpmyadmin_dir }}/$1;
+        fastcgi_param DOCUMENT_ROOT {{ phpmyadmin_dir }};
+        fastcgi_pass unix:{{ php_fpm_socket }};
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $request_filename;
+        fastcgi_param PATH_INFO $fastcgi_path_info;
+        fastcgi_param QUERY_STRING $query_string;
+        include fastcgi_params;
+    }   
             
-   location ~* ^/phpmyadmin/(.+\.(jpg|jpeg|gif|css|png|js|ico|html|xml|txt))$ { 
-               root /usr/share/; 
-       }   
+    location ~* ^/phpmyadmin/(.+\.(jpg|jpeg|gif|css|png|js|ico|html|xml|txt))$ { 
+        alias {{ phpmyadmin_dir }}/$1;
     }  

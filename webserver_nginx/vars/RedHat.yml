@@ -5,7 +5,11 @@ nginx_listen_port: 80
 nginx_listen_https_port: 443
 nginx_conf_file: "{{nginx_conf_dir}}/01_secure.conf"
 php_conf_file: "/etc/php.ini"
+php_fpm_socket: "/var/run/php-fpm/php-fpm.sock"
+php_www_conf_file: "/etc/php-fpm.d/www.conf"
+php_service_name: php-fpm
 nginx_snippets_dir: /etc/nginx
 nginx_sites_conf_dir: /etc/nginx/conf.d
 nginx_sites_conf_enabled_dir: /etc/nginx/conf.d
 nginx_log_dir: /var/log/nginx/
+phpmyadmin_dir: /usr/share/phpMyAdmin

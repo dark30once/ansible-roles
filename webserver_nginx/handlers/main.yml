@@ -4,3 +4,8 @@
       name: "{{ nginx_service_name }}"
       state: restarted
   when: not skip_httpd_restart
+
+- name: restart php
+  service:
+      name: "{{ php_service_name }}"
+      state: restarted
