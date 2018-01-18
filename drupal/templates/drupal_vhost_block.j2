@@ -1,5 +1,5 @@
     
-	include snippets/phpmyadmin.conf;
+	include {{ nginx_snippets_dir }}/phpmyadmin.conf;
 	
     location = /favicon.ico {
         log_not_found off;
@@ -73,7 +73,7 @@
 			fastcgi_param QUERY_STRING $query_string;
 			fastcgi_intercept_errors on;
 			# PHP 5 socket location.
-			fastcgi_pass unix:/var/run/php5-fpm.sock;
+			fastcgi_pass unix:{{ php_fpm_socket }};
 			# PHP 7 socket location.
 			#fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
 	}
