@@ -13,3 +13,4 @@ nginx_sites_conf_dir: /etc/nginx/conf.d
 nginx_sites_conf_enabled_dir: /etc/nginx/conf.d
 nginx_log_dir: /var/log/nginx/
 phpmyadmin_dir: /usr/share/phpMyAdmin
+iptables_input_chain: IN_public_allow

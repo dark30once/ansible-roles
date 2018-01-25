@@ -8,6 +8,21 @@
     state: present
   when: ansible_distribution == "CentOS" and ansible_distribution_version | version_compare("6", ">=")
 
+- name: Uninstall conflicting stuff on CentOS
+  yum: name={{ item }} state=absent
+  with_items:
+      - php-mysql
+      - php-common
+      - php
+      - php-cli
+      - php-fpm
+      - php-xml
+      - php-gd
+      - php-pgsql
+      - php-mcrypt
+      - php-pear
+  when: ansible_distribution == "CentOS" and ansible_distribution_version | version_compare("6", ">=")
+
 - name: Install php CentOS
   yum: name={{ item }} state=present
   with_items:

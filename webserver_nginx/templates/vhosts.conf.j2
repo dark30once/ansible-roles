@@ -59,7 +59,7 @@ server{
     server_name {{ item.servername }}{% if item.serveralias is defined %} {{ item.serveralias }}{% endif %};
     location / {
 {% if item.documentroot is defined %}
-        root {{ item.documentroot }}
+        root {{ item.documentroot }};
 {% endif %}
         return 301 https://$server_name$request_uri;
     }

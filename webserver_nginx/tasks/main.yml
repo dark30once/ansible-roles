@@ -83,6 +83,20 @@
       name: nginx
       state: stopped
 
+- name: allow 80/443 in iptables public input
+  iptables: 
+      chain: "{{ iptables_input_chain }}"
+      destination: 0.0.0.0/0
+      ctstate: NEW
+      protocol: tcp
+      destination_port: "{{ item }}"
+      source: 0.0.0.0/0
+      jump: ACCEPT
+      state: present
+  with_items:
+      - 80
+      - 443
+
 - name: setup lets encrypt SSL
   shell: certbot certonly --keep -n --standalone -m "{{ item.admin_from_email }}" -d "{{ item.servername }}" --agree-tos
   when: item.use_https is defined and item.use_https
@@ -116,8 +130,8 @@
 
 - name: Include OS-specific php tasks
   include: "{{ ansible_os_family }}.php.yml"
-  when: (skip_php == 'false')
+  when: (skip_php == 'false' or skip_php is not defined or not skip_php)
 
 - name: Include PHP tasks
   include: "php.yml"
-  when: (skip_php == 'false')
+  when: (skip_php == 'false' or skip_php is not defined or not skip_php)
