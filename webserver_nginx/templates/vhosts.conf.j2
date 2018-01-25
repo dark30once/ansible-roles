@@ -28,7 +28,7 @@ server {
     add_header Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";
 
 {% endif %}
-{% if item.documentroot is defined %}
+{% if item.documentroot is defined and (item.skiproot is not defined or not item.skiproot) %}
     root {{ item.documentroot }};
 {% endif %}
 
