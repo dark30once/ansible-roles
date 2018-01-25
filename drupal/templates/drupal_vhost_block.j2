@@ -1,7 +1,7 @@
     
 	include {{ nginx_snippets_dir }}/phpmyadmin.conf;
 
-    root {{ item.documentroot }}/web;
+    root {{ item.documentroot }}web;
 	
     location = /favicon.ico {
         log_not_found off;
