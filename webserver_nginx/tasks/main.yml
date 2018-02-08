@@ -96,6 +96,19 @@
   with_items:
       - 80
       - 443
+  when: firewalld_enabled is not defined or not firewalld_enabled
+
+- name: allow 80/443 in firewalld
+  firewalld:
+      service: "{{ item }}"
+      permanent: true
+      immediate: true
+      state: enabled
+  with_items:
+      - http
+      - https
+      - ssh
+  when: firewalld_enabled is defined and firewalld_enabled
 
 - name: setup lets encrypt SSL
   shell: certbot certonly --keep -n --standalone -m "{{ item.admin_from_email }}" -d "{{ item.servername }}" --agree-tos

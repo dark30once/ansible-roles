@@ -1,3 +1,4 @@
+firewalld_enabled: false
 postfix_conf_dir: /etc/postfix/
 postfix_user: postfix
 postfix_group: postfix

@@ -32,7 +32,11 @@
       - regexp: "^listen.owner\ =.*$"
         line: "listen.owner = {{ nginx_user }}"
       - regexp: "^listen.group\ =.*$"
-        line: "listen.owner = {{ nginx_group }}"
+        line: "listen.group = {{ nginx_group }}"
+      - regexp: "^user\ =.*$"
+        line: "user = {{ nginx_user }}"
+      - regexp: "^group\ =.*$"
+        line: "group = {{ nginx_group }}"
   notify: restart php
 
 - name: Copy phpmyadmin

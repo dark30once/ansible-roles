@@ -1,3 +1,4 @@
+firewalld_enabled: true
 nginx_conf_dir: /etc/nginx/conf.d
 nginx_user: nginx
 nginx_group: nginx

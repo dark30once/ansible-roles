@@ -1,6 +1,9 @@
 ---
 # Tasks to install postfix mailforwarder
 
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+
 - name: Include OS-specific tasks
   include: "{{ ansible_os_family }}.yml"
 
@@ -35,6 +38,7 @@
   with_items:
       - 25
       - 465
+  when: not firewalld_enabled
 
 - name: iptables local input allow
   iptables: 
@@ -50,6 +54,7 @@
   with_items:
       - 25
       - 465
+  when: not firewalld_enabled
 
 - name: iptables public input drop
   iptables: 
@@ -65,4 +70,38 @@
   with_items:
       - 25
       - 465
+  when: not firewalld_enabled
+
+- name: firewalld block smtp on public input
+  firewalld: 
+      zone: public
+      service: "{{ item }}"
+      state: disabled
+      permanent: true
+      immediate: true
+  with_items:
+      - smtp
+      - smtps
+  when: firewalld_enabled
+
+- name: Add lo to zone internal on firewalld
+  firewalld:
+      zone: internal
+      interface: lo
+      permanent: true
+      state: enabled
+      immediate: true
+  when: firewalld_enabled
+
+- name: firewalld smtp internal input allow
+  firewalld: 
+      zone: internal
+      service: "{{ item }}"
+      state: enabled
+      permanent: true
+      immediate: true
+  with_items:
+      - smtp
+      - smtps
+  when: firewalld_enabled
 

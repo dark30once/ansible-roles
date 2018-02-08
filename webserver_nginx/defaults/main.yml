@@ -1,3 +1,4 @@
+firewalld_enabled: false
 skip_httpd_restart: false
 nginx_vhosts: []
 nginx_remove_files: []
