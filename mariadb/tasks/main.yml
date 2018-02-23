@@ -8,4 +8,4 @@
   include: "{{ ansible_os_family }}.yml"
 
 - name: mariadb service state
-  service: name=mariadb state=started enabled=yes
+  service: name=mysql state=started enabled=yes

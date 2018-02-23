@@ -38,8 +38,8 @@
       - python-psutil
       - python-openssl
       - python-acme
-      - python-certbot
-      - python-certbot-nginx
+      - python3-certbot
+      - python3-certbot-nginx
       - certbot
   when: ansible_distribution == "Ubuntu"
 
