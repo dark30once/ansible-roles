@@ -26,6 +26,7 @@
       - git
       - ntp
       - vim
+      - bzip2
       - screen
       - htop
       - cron
