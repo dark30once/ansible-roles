@@ -1,3 +1,6 @@
+[Install]
+WantedBy=multi-user.target
+
 [Unit]
 Description='Jupyter Dashboards Server'
 
@@ -9,6 +12,6 @@ Environment="NOTEBOOKS_DIR=/srv/jupyter-dashboards/"
 Environment="IP=0.0.0.0"
 Environment="PORT=3000"
 WorkingDirectory=/srv/jupyter-dashboards/
-User=ubuntu
-Group=ubuntu
-ExecStart=/usr/local/bin/jupyter-dashboards-server
+User={{ jupyter_user }}
+Group={{ jupyter_group }}
+ExecStart=/usr/bin/jupyter-dashboards-server

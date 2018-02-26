@@ -1,9 +1,13 @@
+[Install]
+WantedBy=multi-user.target
+
+
 [Unit]
 Description='Jupyter Kernelgateway Server'
 
 [Service]
 Type=simple
 WorkingDirectory=/srv/jupyter-dashboards/
-User=ubuntu
-Group=ubuntu
+User={{ jupyter_user }}
+Group={{ jupyter_group }}
 ExecStart=/usr/local/bin/jupyter-kernelgateway --port=8888 --ip=127.0.0.1

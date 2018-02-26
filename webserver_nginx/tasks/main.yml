@@ -107,7 +107,6 @@
   with_items:
       - http
       - https
-      - ssh
   when: firewalld_enabled is defined and firewalld_enabled
 
 - name: allow 80/443 in ufw
@@ -118,7 +117,6 @@
   with_items:
       - http
       - https
-      - ssh
   when: ufw_enabled is defined and ufw_enabled
 
 - name: setup lets encrypt SSL

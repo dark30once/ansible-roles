@@ -14,7 +14,7 @@
       - php5.6
       - php-fpm
       - php-gd
-      - php-mysqlnd
+      - php5.6-mysql
       - php-curl
       - php-pgsql
       - php-mcrypt

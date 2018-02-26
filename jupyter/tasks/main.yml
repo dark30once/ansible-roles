@@ -10,6 +10,14 @@
 - name: Ansible service manager
   debug: var=ansible_service_mgr
 
+- set_fact:
+    vhost_block: "{{ lookup('template', 'templates/jupyter_vhost_block.j2') }}"
+  with_items: "{{ nginx_vhosts }}"
+  when: "{{ item.jupyter }} is defined and {{ item.jupyter }}"  
+
+- name: vhost_block
+  debug: var=vhost_block
+
 - name: NPM fs
   file:
       path: "{{ item }}"
@@ -22,7 +30,9 @@
       - /tmp/.npm/_locks
 
 - name: install jupyter-dashboards-server
-  shell: HOME=/tmp/ npm install -g jupyter-dashboards-server
+  become: True
+  become_user: root
+  shell: HOME=/tmp USER=root npm --unsafe install -g jupyter-dashboards-server
 
 - name: Install python3 packages
   pip: executable=pip3 name={{ item }} state=present
@@ -33,6 +43,7 @@
       - py-bcrypt
       - ipython
       - jupyter-client
+      - jupyter-console
       - jupyter-contrib-core
       - jupyter-contrib-nbextensions
       - jupyter-dashboards
@@ -47,6 +58,7 @@
       - simpledbf
       - pivottablejs
       - tables
+      - sklearn
       - XlsxWriter
       - xlrd
       - ipykernel
@@ -62,6 +74,7 @@
       - pandas
       - numpy
       - plotly
+      - sklearn
       - fuzzywuzzy
       - simpledbf
       - pivottablejs
@@ -74,12 +87,28 @@
 - name: Install python packages
   pip: executable=pip name=ipython version=5.3.0 state=present
 
+- name: Setup jupyter group
+  group:
+      name: "{{ jupyter_group }}"
+      system: yes
+      state: present
+
+- name: Setup jupyter user
+  user:
+      name: "{{ jupyter_user }}"
+      state: present
+      group: "{{ jupyter_group }}"
+      home: /srv/jupyter-dashboards
+      createhome: yes
+      shell: /bin/false
+      system: yes
+
 - name: Setup fs
   file:
       path: /srv/jupyter-dashboards
       state: directory
-      owner: ubuntu
-      group: ubuntu
+      owner: "{{ jupyter_user }}"
+      group: "{{ jupyter_group }}"
       mode: 0755
 
 - name: Copy upstart service
@@ -142,23 +171,7 @@
 - name: Setup nginx reverse proxy
   blockinfile:
       dest: "{{ nginx_sites_conf_dir }}/{{ item.servername }}.conf"
-      block: |
-        location / {
-            proxy_set_header Host $http_host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-Proto $scheme;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_pass http://127.0.0.1:3000/;
-            proxy_redirect off;
-        }
-        location /api/kernels {
-            proxy_pass http://127.0.0.1:3000/api/kernels;
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection "upgrade";
-            proxy_connect_timeout 7d;
-            proxy_send_timeout 7d;
-            proxy_read_timeout 7d;
-        }
+      content: "{{ vhost_block }}"
   when: "{{ item.jupyter }} is defined and {{ item.jupyter }}"  
   with_items: "{{ nginx_vhosts }}"
+  notify: restart nginx
