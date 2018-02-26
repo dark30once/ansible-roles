@@ -90,7 +90,7 @@
 - name: Setup mysql user
   mysql_user:
       name: "{{ item.item.server_machine_name }}"
-      password: "{{ item.stdout.split('\n')[0] }}"
+      password: "{{ item.stdout_lines[0] }}"
       login_user: root
       state: present
       priv: "{{ item.item.server_machine_name }}.*:ALL"
