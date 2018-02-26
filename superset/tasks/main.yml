@@ -13,7 +13,53 @@
 - set_fact:
     vhost_block: "{{ lookup('template', 'templates/superset_vhost_block.j2') }}"
   with_items: "{{ nginx_vhosts }}"
-  when: "{{ item.superset }} is defined and {{ item.jupyter }}"  
+  when: "{{ item.superset }} is defined and {{ item.superset }}"  
+
+- name: Generate passwords and secret_keys
+  shell: "pwgen -s -n 10 1;pwgen -s -n 100 1;pwgen -s -n 10 1;"
+  register: passwords
+  with_items: "{{ nginx_vhosts }}"
+  when: item.superset is defined and item.superset 
+
+- name: Setup postgres user
+  postgresql_user:
+      name: superset
+      state: present
+      password: "{{ item.stdout_lines[0] }}"
+      no_password_changes: yes
+  become: True
+  become_user: postgres
+  become_method: sudo
+  register: postgresql_user_created
+  with_items: "{{ passwords.results }}"
+  when: "{{ item.item.superset }} is defined and {{ item.item.superset }}"
+
+- name: Setup postgres database
+  postgresql_db:
+      name: superset
+      state: present
+      owner: superset
+  become: True
+  become_user: postgres
+  become_method: sudo
+  register: postgres_db_created
+  with_items: "{{ passwords.results }}"
+  when: "{{ item.item.superset }} is defined and {{ item.item.superset }}"
+
+- name: "Check for existing config"
+  stat:
+      path: "/srv/supserset/superset_config.py"
+  register: config_file
+
+- name: "Setup superset config"
+  template:
+      src: "superset_config.py.j2"
+      dest: "/srv/superset/superset_config.py"
+      owner: "{{ superset_user }}"
+      group: "{{ superset_group }}"
+      mode: 0444
+  with_items: "{{ passwords.results }}"
+  when: "{{ item.item.superset }} is defined and {{ item.item.superset }} and not {{ config_file.stat.exists }}"
 
 - name: Install python3 packages
   pip: executable=pip3 name={{ item }} state=present
@@ -26,6 +72,10 @@
       - numpy
       - sklearn
       - fuzzywuzzy
+      - celery
+      - gevent
+      - redis
+      - redispy
       - simpledbf
       - XlsxWriter
       - xlrd
@@ -36,12 +86,12 @@
   with_items:
       - virtualenv
       - virtualenvwrapper
-      - superset
       - py-bcrypt
       - pandas
       - numpy
-      - sklearn
       - fuzzywuzzy
+      - redis
+      - redispy
       - simpledbf
       - XlsxWriter
       - xlrd
@@ -89,15 +139,52 @@
       mode: 0644
   when: ansible_service_mgr=='systemd'
 
-- name: Start superset dashboards server
+- name: Setup nginx reverse proxy
+  blockinfile:
+      dest: "{{ nginx_sites_conf_dir }}/{{ item.servername }}.conf"
+      content: "{{ vhost_block }}"
+  when: "{{ item.superset }} is defined and {{ item.superset }}"  
+  with_items: "{{ nginx_vhosts }}"
+
+- debug: msg="Database created? {{ postgres_db_created.changed }}"
+
+- name: superset admin password
+  debug: msg="Admin password {{ item.stdout_lines[2] }}"
+  with_items: "{{ passwords.results }}"
+  when: "{{ item.item.superset }} is defined and {{ item.item.superset }} and {{ postgres_db_created.changed }}"
+
+- name: Setup superset admin user
+  shell: "PYTHONPATH=/srv/superset fabmanager create-admin --app superset --username admin --firstname admin --lastname user --password {{ item.stdout_lines[2] }} --email admin@fab.org"
+  become: True
+  become_user: superset
+  become_method: sudo
+  with_items: "{{ passwords.results }}"
+  when: "{{ item.item.superset }} is defined and {{ item.item.superset }} and {{ postgres_db_created.changed }}"
+
+- name: Setup superset data
+  shell: "PYTHONPATH=/srv/superset superset db upgrade"
+  become: True
+  become_user: superset
+  become_method: sudo
+  when: "{{ postgres_db_created.changed }}"
+
+- name: Setup superset example data
+  shell: "PYTHONPATH=/srv/superset superset load_examples"
+  become: True
+  become_user: superset
+  become_method: sudo
+  when: "{{ postgres_db_created.changed }}"
+
+- name: Setup superset data2
+  shell: "PYTHONPATH=/srv/superset superset init"
+  become: True
+  become_user: superset
+  become_method: sudo
+  when: "{{ postgres_db_created.changed }}"
+
+- name: Start superset server
   service:
       name: superset
       enabled: yes
       state: started
 
-- name: Setup nginx reverse proxy
-  blockinfile:
-      dest: "{{ nginx_sites_conf_dir }}/{{ item.servername }}.conf"
-      content: "{{ vhost_block }}"
-  when: "{{ item.superset }} is defined and {{ item.jupyter }}"  
-  with_items: "{{ nginx_vhosts }}"
