@@ -1,0 +1,14 @@
+start on runlevel [2345]
+stop on runlevel [!2345]
+script
+    PUBLIC_LINK_PATTERN=http://{{ servername }}:3000
+    KERNEL_GATEWAY_URL=http://127.0.0.1:8888
+    NOTEBOOKS_DIR=/srv/jupyter-dashboards/
+    IP=0.0.0.0
+    PORT=3000
+    export IP
+    export PORT
+    export KERNEL_GATEWAY_URL
+    export NOTEBOOKS_DIR
+    exec jupyter-dashboards-server
+end script

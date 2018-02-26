@@ -1,0 +1,103 @@
+---
+# Tasks to install python gunicorn and circus
+#
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Include OS-specific taks
+  include: "{{ ansible_os_family }}.yml"
+
+- name: Ansible service manager
+  debug: var=ansible_service_mgr
+
+- set_fact:
+    vhost_block: "{{ lookup('template', 'templates/superset_vhost_block.j2') }}"
+  with_items: "{{ nginx_vhosts }}"
+  when: "{{ item.superset }} is defined and {{ item.jupyter }}"  
+
+- name: Install python3 packages
+  pip: executable=pip3 name={{ item }} state=present
+  with_items:
+      - virtualenv
+      - virtualenvwrapper
+      - superset
+      - py-bcrypt
+      - pandas
+      - numpy
+      - sklearn
+      - fuzzywuzzy
+      - simpledbf
+      - XlsxWriter
+      - xlrd
+      - autopep8
+
+- name: Install python packages
+  pip: executable=pip name={{ item }} state=present
+  with_items:
+      - virtualenv
+      - virtualenvwrapper
+      - superset
+      - py-bcrypt
+      - pandas
+      - numpy
+      - sklearn
+      - fuzzywuzzy
+      - simpledbf
+      - XlsxWriter
+      - xlrd
+      - autopep8
+
+- name: Setup superset group
+  group:
+      name: "{{ superset_group }}"
+      system: yes
+      state: present
+
+- name: Setup superset user
+  user:
+      name: "{{ superset_user }}"
+      state: present
+      group: "{{ superset_group }}"
+      home: /srv/superset
+      createhome: yes
+      shell: /bin/false
+      system: yes
+
+- name: Setup fs
+  file:
+      path: /srv/superset
+      state: directory
+      owner: "{{ superset_user }}"
+      group: "{{ superset_group }}"
+      mode: 0755
+
+- name: Copy upstart service
+  template:
+      src: superset.conf.upstart.j2 
+      dest: /etc/init/superset.conf
+      owner: root
+      group: root
+      mode: 0644
+  when: ansible_service_mgr=='upstart'
+
+- name: Copy systemd service
+  template:
+      src: superset.service.systemd.j2 
+      dest: /etc/systemd/system/superset.service
+      owner: root
+      group: root
+      mode: 0644
+  when: ansible_service_mgr=='systemd'
+
+- name: Start superset dashboards server
+  service:
+      name: superset
+      enabled: yes
+      state: started
+
+- name: Setup nginx reverse proxy
+  blockinfile:
+      dest: "{{ nginx_sites_conf_dir }}/{{ item.servername }}.conf"
+      content: "{{ vhost_block }}"
+  when: "{{ item.superset }} is defined and {{ item.jupyter }}"  
+  with_items: "{{ nginx_vhosts }}"

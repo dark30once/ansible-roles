@@ -1,0 +1,23 @@
+[Unit]
+Description='Superset Server'
+After=network.target
+
+[Service]
+PIDFile=/run/gunicorn/pid
+Environment="IP=0.0.0.0"
+WorkingDirectory=/srv/superset/
+RuntimeDirectory=gunicorn
+User={{ superset_user }}
+Group={{ superset_group }}
+ExecStart=/usr/bin/gunicorn -w 10 -k gevent \
+            --limit-request-line 0 --limit-field-size 0 \
+            --statsd-host localhost:8125 \
+            --timeout 120 --pid=/run/gunicorn/pid \
+            --bind 127.0.0.1:6666 \
+            superset:app
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+PrivateTemp=true
+
+[Install]
+WantedBy=multi-user.target
