@@ -18,7 +18,7 @@ SECRET_KEY = '{{ item.stdout_lines[1] }}'
 # superset metadata (slices, connections, tables, dashboards, ...).
 # Note that the connection information to connect to the datasources
 # you want to explore are managed directly in the web UI
-SQLALCHEMY_DATABASE_URI = 'postgresql://superset:{{ item.stdout_lines[0] }}@localhost/superset'
+SQLALCHEMY_DATABASE_URI = 'postgresql:///superset'
 
 # Flask-WTF flag for CSRF
 WTF_CSRF_ENABLED = True
