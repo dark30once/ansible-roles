@@ -12,8 +12,6 @@
       - python-setuptools
       - python-pip
       - python-dev
-      - postgresql-server-dev-9.4
-      - postgresql-server-dev-all
       - libpq-dev
       - mysql-client
       - libmysqlclient-dev
