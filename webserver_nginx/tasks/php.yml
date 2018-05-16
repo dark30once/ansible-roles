@@ -3,6 +3,12 @@
 - name: Tighten down php config
   ini_file: dest={{ php_conf_file }} option={{ item.key }} value={{ item.value }} section={{ item.section }} state=present
   with_items:
+      - key: "post_max_size"
+        value: "500M"
+        section: "PHP"
+      - key: "upload_max_filesize"
+        value: "500M"
+        section: "PHP"
       - key: "expose_php"
         value: "Off"
         section: "PHP"
