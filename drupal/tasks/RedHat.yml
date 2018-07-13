@@ -5,11 +5,4 @@
   yum: name={{ item }} state=present
   with_items:
       - php-ldap
-  when: ansible_distribution != "CentOS"
 
-
-- name: Install php56w-ldap
-  yum: name={{ item }} state=present
-  with_items:
-      - php56w-ldap
-  when: ansible_distribution == "CentOS" and ansible_distribution_version | version_compare("6", ">=")

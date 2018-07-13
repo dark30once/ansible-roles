@@ -2,31 +2,45 @@
 ---
 # RedHat/CentOS specific tasks
 
-- name: Add Webstatic EL yum repos
+- name: Remove Webtatic EL yum repos
   yum: 
     name: https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
+    state: absent
+  when: ansible_distribution == "CentOS" and ansible_distribution_version | version_compare("6", ">=")
+
+- name: Remove webtatic rpm
+  yum:
+      name: webtatic-release
+      state: absent
+
+- name: Add Remi EL yum repos
+  yum: 
+    name: http://rpms.remirepo.net/enterprise/remi-release-7.rpm
     state: present
   when: ansible_distribution == "CentOS" and ansible_distribution_version | version_compare("6", ">=")
+
+- name: Add remi-php72
+  yum_repository:
+    name: remi-php72
+    description: Remi's PHP 7.2 RPM repository for Enterprise Linux $releasever - $basearch
+    mirrorlist: http://rpms.remirepo.net/enterprise/$releasever/php72/mirror
+    enabled: yes
+    gpgcheck: 1
+    gpgkey: http://rpms.remirepo.net/RPM-GPG-KEY-remi
 
 - name: Uninstall conflicting stuff on CentOS
   yum: name={{ item }} state=absent
   with_items:
-      - php-mysql
-      - php-common
-      - php
-      - php-cli
-      - php-fpm
-      - php-xml
-      - php-gd
-      - php-pgsql
-      - php-mcrypt
-      - php-pear
-  when: ansible_distribution == "CentOS" and ansible_distribution_version | version_compare("6", ">=")
-
-- name: Install php CentOS
-  yum: name={{ item }} state=present
-  with_items:
       - php56w
+      - php56w-xml
+      - php56w-ldap
+      - php56w-cli
+      - php56w-process
+      - php56w-bcmath
+      - php56w-mbstring
+      - php56w-pdo
+      - php56w-tidy
+      - php56w-common
       - php56w-fpm
       - php56w-gd
       - php56w-opcache
@@ -34,6 +48,22 @@
       - php56w-pear
       - php56w-pgsql
       - php56w-mcrypt
+  when: ansible_distribution == "CentOS" and ansible_distribution_version | version_compare("6", ">=")
+
+- name: Install php CentOS
+  yum: name={{ item }} state=present
+  with_items:
+      - php
+      - php-common
+      - php-bcmath
+      - php-cli
+      - php-fpm
+      - php-gd
+      - php-opcache
+      - php-mysqlnd
+      - php-pear
+      - php-pgsql
+      - php-mcrypt
       - phpMyAdmin
   when: ansible_distribution == "CentOS" and ansible_distribution_version | version_compare("6", ">=")
 

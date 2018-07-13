@@ -5,3 +5,4 @@ nginx_remove_files: []
 nginx_conf_enable_dir:
 nginx_service_name: nginx
 skip_php: false
+php_session_dir: /var/lib/php/
