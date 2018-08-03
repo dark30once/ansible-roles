@@ -1,3 +1,4 @@
+secure_php: true
 firewalld_enabled: false
 skip_httpd_restart: false
 nginx_vhosts: []

@@ -1,6 +1,5 @@
 ---
-
-- name: Tighten down php config
+- name: Allow bigger php file uploads and other generic php stuff
   ini_file: dest={{ php_conf_file }} option={{ item.key }} value={{ item.value }} section={{ item.section }} state=present
   with_items:
       - key: "post_max_size"
@@ -9,6 +8,14 @@
       - key: "upload_max_filesize"
         value: "500M"
         section: "PHP"
+      - key: 'error_log'
+        value: '/var/log/nginx/php.log'
+        section: 'PHP'
+  notify: restart nginx
+
+- name: Tighten down php config
+  ini_file: dest={{ php_conf_file }} option={{ item.key }} value={{ item.value }} section={{ item.section }} state=present
+  with_items:
       - key: "expose_php"
         value: "Off"
         section: "PHP"
@@ -21,10 +28,26 @@
       - key: "display_errors"
         value: "Off"
         section: 'PHP'
-      - key: 'error_log'
-        value: '/var/log/nginx/php.log'
+  notify: restart nginx
+  when: "secure_php"
+
+- name: Loosen upphp config
+  ini_file: dest={{ php_conf_file }} option={{ item.key }} value={{ item.value }} section={{ item.section }} state=present
+  with_items:
+      - key: "expose_php"
+        value: "On"
+        section: "PHP"
+      - key: 'allow_url_fopen'
+        value: 'On'
+        section: 'PHP'
+      - key: 'allow_url_include'
+        value: 'On'
+        section: 'PHP'
+      - key: "display_errors"
+        value: "On"
         section: 'PHP'
   notify: restart nginx
+  when: "not secure_php"
 
 - name: setup php-fpm socket
   lineinfile:
