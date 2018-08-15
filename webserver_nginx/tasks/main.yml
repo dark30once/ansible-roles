@@ -124,6 +124,20 @@
   when: item.use_https is defined and item.use_https
   with_items: "{{ nginx_vhosts }}"
 
+- name: Copy letsencrypt renewal cronjob
+  synchronize: src=files/renew_letsencrypt_systemd.sh dest=/usr/local/bin/renew_letsencrypt
+  when: item.use_https is defined and item.use_https
+  with_items: "{{ nginx_vhosts }}"
+
+- name: Setup letsencrypt renewal cronjob
+  cron: 
+    job: "/usr/local/bin/renew_letsencrypt"
+    hour: "0-5"
+    name: "renew_letsencrypt"
+    state: present
+  when: item.use_https is defined and item.use_https
+  with_items: "{{ nginx_vhosts }}"
+
 - name: start nginx
   service:
       name: nginx
