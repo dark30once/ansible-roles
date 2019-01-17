@@ -16,6 +16,8 @@
   with_items:
       - MariaDB-client
       - MariaDB-server
+      - MariaDB-devel
+      - MariaDB-shared
       - MySQL-python
   when: ansible_distribution == "CentOS" or ansible_distribution_major_version == "7"
 
@@ -24,5 +26,6 @@
   with_items:
       - mariadb
       - mariadb-server
+      - mariadb-devel
       - MySQL-python
   when: ansible_distribution != "CentOS" or ansible_distribution_major_version != "7"
