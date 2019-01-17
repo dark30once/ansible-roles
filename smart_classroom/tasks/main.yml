@@ -1,0 +1,224 @@
+---
+# Tasks to install python gunicorn and circus
+#
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Include OS-specific taks
+  include: "{{ ansible_os_family }}.yml"
+
+- name: Ansible service manager
+  debug: var=ansible_service_mgr
+
+- set_fact:
+    vhost_block: "{{ lookup('template', 'templates/smart_classroom_vhost_block.j2') }}"
+  with_items: "{{ nginx_vhosts }}"
+  when: "{{ item.smart_classroom }} is defined and {{ item.smart_classroom }}"  
+
+- name: Check virtualenv exists
+  stat:
+      path: /home/{{ smartclassroom_user }}/.virtualenvs/smartclassroom
+  register: virtualenv
+
+- name: Generate passwords and secret_keys
+  shell: "pwgen -s -n 10 1;pwgen -s -n 100 1;pwgen -s -n 10 1;"
+  register: passwords
+  with_items: "{{ nginx_vhosts }}"
+  when: item.smart_classroom is defined and item.smart_classroom 
+
+- name: Setup mysql database
+  mysql_db:
+      name: smart_classroom
+      state: present
+  register: mysql_db_created
+  with_items: "{{ passwords.results }}"
+  when: "{{ item.item.smart_classroom }} is defined and {{ item.item.smart_classroom }}"
+
+- name: Setup mysql user
+  mysql_user:
+      name: smart_classroom
+      state: present
+      priv: "smart_classrom.*:ALL"
+      password: "{{ item.stdout_lines[0] }}"
+      update_password: on_create
+  register: mysql_user_created
+  with_items: "{{ passwords.results }}"
+  when: "{{ item.item.smart_classroom }} is defined and {{ item.item.smart_classroom }}"
+
+- name: Create mysql_uri
+  set_fact:
+    mysql_uri: "mysql+pymysql://smart_classroom:{{ item.stdout_lines[0] }}@localhost/smart_classroom"
+  with_items: "{{ passwords.results }}"
+  when: "{{ item.item.smart_classroom }} is defined and {{ item.item.smart_classroom }}"
+
+- name: Install python3 packages
+  pip: executable=pip3 name={{ item }} state=present
+  with_items:
+      - virtualenv
+      - virtualenvwrapper
+
+- name: Install python packages
+  pip: executable=pip name={{ item }} state=present
+  with_items:
+      - virtualenv
+      - virtualenvwrapper
+
+- name: Setup smart classroom group
+  group:
+      name: "{{ smartclassroom_group }}"
+      system: yes
+      state: present
+
+- name: Setup smart classroom user
+  user:
+      name: "{{ smartclassroom_user }}"
+      state: present
+      group: "{{ smartclassroom_group }}"
+      home: /home/{{ smartclassroom_user }}
+      createhome: yes
+      shell: /bin/false
+      system: yes
+
+- name: Setup virtual environment
+  shell: . {{ virtualenvwrapper }} && mkvirtualenv -p /usr/bin/python3 smartclassroom
+  become: yes
+  become_user: "{{ smartclassroom_user }}"
+  become_method: sudo
+  when: not virtualenv.stat.exists
+
+- name: Temporarily remove fs frontend
+  file:
+      path: /srv/smartclassroom_frontend/dist
+      state: absent
+
+- name: Clone smart classroom frontend git repos
+  git:
+      repo: https://github.com/NightowlPH/smartclassroom_frontend.git
+      dest: /srv/smartclassroom_frontend
+      force: yes
+      version: master
+
+- name: Clone smart classroom backend git repos
+  git:
+      repo: https://github.com/NightowlPH/smartclassroom_backend.git
+      dest: /srv/smartclassroom_backend
+      force: yes
+      version: master
+
+- name: Setup fs backend
+  file:
+      path: /srv/smartclassroom_backend
+      state: directory
+      recurse: yes
+      owner: "{{ smartclassroom_user }}"
+      group: "{{ smartclassroom_group }}"
+
+- name: Setup fs backend log
+  file:
+      path: /var/log/smartclassroom_backend
+      state: directory
+      recurse: yes
+      owner: "{{ smartclassroom_user }}"
+      group: "{{ smartclassroom_group }}"
+
+- name: Setup fs frontend
+  file:
+      path: /srv/smartclassroom_frontend
+      state: directory
+      recurse: yes
+      owner: "{{ nginx_user }}"
+      group: "{{ nginx_group }}"
+
+- name: Setup fs backend instance
+  file:
+      path: /srv/smartclassroom_backend/instance
+      state: directory
+      recurse: yes
+      owner: "{{ smartclassroom_user }}"
+      group: "{{ smartclassroom_group }}"
+
+- name: set SELinux fcontext
+  shell: semanage fcontext -t {{ item.type }} -a "{{ item.target }}(/.*)?"
+  with_items:
+      - target: '/srv/smartclassroom_frontend'
+        type: httpd_sys_rw_content_t
+  when: selinux_host is defined and selinux_host
+
+- name: set SELinux fcontext part2
+  shell: restorecon -Rv "{{ item.target }}"
+  with_items:
+      - target: '/srv/smartclassroom_frontend'
+  when: selinux_host is defined and selinux_host
+
+- name: Install python requirements
+  pip: virtualenv=/home/{{ smartclassroom_user }}/.virtualenvs/smartclassroom requirements=/srv/smartclassroom_backend/requirements.txt state=latest
+  with_items:
+      - virtualenv
+      - virtualenvwrapper
+
+- name: Setup nginx reverse proxy
+  blockinfile:
+      dest: "{{ nginx_sites_conf_dir }}/{{ item.servername }}.conf"
+      content: "{{ vhost_block }}"
+  when: "{{ item.smart_classroom }} is defined and {{ item.smart_classroom }}"  
+  with_items: "{{ nginx_vhosts }}"
+
+- name: "Check for existing config"
+  stat:
+      path: "/srv/smartclassroom_backend/instance/config.py"
+  register: config_file
+
+- name: "Setup smart classroom config"
+  template:
+      src: "smartclassroom_config.py.j2"
+      dest: "/srv/smartclassroom_backend/instance/config.py"
+      owner: "{{ smartclassroom_user }}"
+      group: "{{ smartclassroom_group }}"
+      mode: 0444
+  with_items: "{{ passwords.results }}"
+  when: "{{ item.item.smart_classroom }} is defined and {{ item.item.smart_classroom }} and not {{ config_file.stat.exists }}"
+
+- name: "Setup smartclassroom circus config"
+  template:
+      src: "smartclassroom_circus.ini.j2"
+      dest: "/etc/circus/conf.d/smartclassroom.ini"
+      owner: root
+      group: root
+      mode: 0444
+  notify: reload circus
+
+- name: allow 1886 (mosquitto) in iptables public input
+  iptables: 
+      chain: "{{ iptables_input_chain }}"
+      destination: 0.0.0.0/0
+      ctstate: NEW
+      protocol: tcp
+      destination_port: "{{ item }}"
+      source: 0.0.0.0/0
+      jump: ACCEPT
+      state: present
+  with_items:
+      - 1886
+  when: (firewalld_enabled is not defined or not firewalld_enabled or firewalld_enabled=="false") and (ufw_enabled is not defined or not ufw_enabled or ufw_enabled=="false")
+
+- name: allow 1886 (mosquitto) in firewalld
+  firewalld:
+      port: "{{ item }}"
+      permanent: true
+      immediate: true
+      state: enabled
+  with_items:
+      - 1886/tcp
+  when: firewalld_enabled is defined and (firewalld_enabled==true or firewalld_enabled=="true")
+
+- name: allow 1886 (mosquitto) in ufw
+  ufw:
+      port: "{{ item }}"
+      state: enabled
+      policy: allow
+  with_items:
+      - 1886
+  when: ufw_enabled is defined and (ufw_enabled==true or ufw_enabled=="true")
+
+- name: mosquitto service state
+  service: name=mosquitto state=started enabled=yes

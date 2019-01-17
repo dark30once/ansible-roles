@@ -1,0 +1,8 @@
+---
+# Debian specific tasks
+
+- name: Install Debian Requirements
+  apt: name={{ item }} state=latest 
+  with_items:
+      - redis-server
+      - mosquitto

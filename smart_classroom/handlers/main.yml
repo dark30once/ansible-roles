@@ -1,0 +1,10 @@
+- name: reload circus
+  shell: "{{ circusctl }} {{ item }}"
+  with_items:
+      - reloadconfig
+      - restart smartclassroom
+
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted
