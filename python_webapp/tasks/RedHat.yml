@@ -1,10 +1,16 @@
 ---
 # RedHat/Centos specific tasks
 
-- name: Install required debian packages
+- name: Install required RedHat packages
   yum: name={{ item }} state=present update_cache=yes
   with_items:
+      - python2-pip
+      - python-devel
       - python34
       - python34-pip
       - python34-devel
       - postgresql-devel
+      - MariaDB-devel
+      - "@Development tools"
+      - zlib-devel
+      - openssl-devel
