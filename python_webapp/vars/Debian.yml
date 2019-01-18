@@ -1,2 +1,3 @@
 circusctl: /usr/local/bin/circusctl
+circusd: /usr/local/bin/circusd
 virtualenvwrapper: /usr/local/bin/virtualenvwrapper.sh

@@ -1,5 +1,5 @@
 ---
-# Tasks to install python gunicorn and circus
+# Tasks to install the Smart Classroom software
 #
 - name: Include OS-specific variables
   include_vars: "{{ ansible_os_family }}.yml"
@@ -26,6 +26,11 @@
   with_items: "{{ nginx_vhosts }}"
   when: item.smart_classroom is defined and item.smart_classroom 
 
+- name: show passwords
+  debug: "{{ item.stdout_lines }}"
+  with_items: "{{ passwords.results }}"
+  when: item.smart_classroom is defined and item.smart_classroom 
+
 - name: Setup mysql database
   mysql_db:
       name: smart_classroom
@@ -38,7 +43,7 @@
   mysql_user:
       name: smart_classroom
       state: present
-      priv: "smart_classrom.*:ALL"
+      priv: "smart_classroom.*:ALL"
       password: "{{ item.stdout_lines[0] }}"
       update_password: on_create
   register: mysql_user_created
@@ -152,9 +157,9 @@
 
 - name: Install python requirements
   pip: virtualenv=/home/{{ smartclassroom_user }}/.virtualenvs/smartclassroom requirements=/srv/smartclassroom_backend/requirements.txt state=latest
-  with_items:
-      - virtualenv
-      - virtualenvwrapper
+
+- name: Install gunicorn
+  pip: virtualenv=/home/{{ smartclassroom_user }}/.virtualenvs/smartclassroom name=gunicorn state=latest
 
 - name: Setup nginx reverse proxy
   blockinfile:

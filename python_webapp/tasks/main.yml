@@ -27,6 +27,13 @@
       - mysqlclient
       - py-bcrypt
 
+- name: set SELinux bool httpd_can_network_connect
+  seboolean:
+      name: httpd_can_network_connect
+      state: yes
+      persistent: yes
+  when: selinux_host is defined and selinux_host
+
 - name: Include circus tasks
   include: circus.yml
   when: python_run_circus
