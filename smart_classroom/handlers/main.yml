@@ -2,7 +2,8 @@
   shell: "{{ circusctl }} {{ item }}"
   with_items:
       - reloadconfig
-      - restart smartclassroom
+      - restart smart_classroom
+      - restart smart_classroom_mqtt
 
 - name: restart nginx
   service:

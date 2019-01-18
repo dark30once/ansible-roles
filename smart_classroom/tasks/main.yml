@@ -225,5 +225,37 @@
       - 1886
   when: ufw_enabled is defined and (ufw_enabled==true or ufw_enabled=="true")
 
+- name: mosquitto fs
+  file:
+      path: /etc/mosquitto/conf.d
+      state: directory
+      owner: root
+      group: root
+
+- name: mosquitto fs
+  file:
+      path: /var/lib/moqsuitto
+      state: directory
+      owner: mosquitto
+      group: root
+
+- name: "Setup mosquitto config"
+  template:
+      src: "mosquitto.conf.j2"
+      dest: "/etc/mosquitto/mosquitto.conf"
+      owner: root
+      group: root
+      mode: 0444
+  with_items: "{{ nginx_vhosts }}"
+  when: "{{ item.smart_classroom }} is defined and {{ item.smart_classroom }}"  
+
+- name: "Setup mosquitto password"
+  expect:
+      command: mosquitto_passwd -c /etc/mosquitto/passwd smartclassroom
+      responses:
+          (?i):password: item.stdout_lines[2]
+  with_items: "{{ passwords.results }}"
+  when: "{{ item.item.smart_classroom }} is defined and {{ item.item.smart_classroom }} and not {{ config_file.stat.exists }}"
+
 - name: mosquitto service state
   service: name=mosquitto state=started enabled=yes

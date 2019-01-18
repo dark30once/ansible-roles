@@ -1,0 +1,16 @@
+pid_file /var/run/mosquitto.pid
+
+persistence true
+persistence_location /var/lib/mosquitto/
+allow_anonymous false
+password_file /etc/mosquitto/passwd
+{% if item.use_https %}
+cafile = /etc/letsencrypt/live/{{ item.servername }}/chain.pem
+certfile = /etc/letsencrypt/live/{{ item.servername }}/cert.pem
+keyfile = /etc/letsencrypt/live/{{ item.servername }}/privkey.pem
+require_certificate false
+{% endif %}
+
+log_dest file /var/log/mosquitto/mosquitto.log
+
+include_dir /etc/mosquitto/conf.d
