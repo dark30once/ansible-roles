@@ -61,12 +61,14 @@
   with_items:
       - virtualenv
       - virtualenvwrapper
+      - pexpect
 
 - name: Install python packages
   pip: executable=pip name={{ item }} state=present
   with_items:
       - virtualenv
       - virtualenvwrapper
+      - pexpect
 
 - name: Setup smart classroom group
   group:
@@ -234,10 +236,13 @@
 
 - name: mosquitto fs
   file:
-      path: /var/lib/moqsuitto
+      path: "{{ item }}"
       state: directory
       owner: mosquitto
       group: root
+  with_items:
+      - /var/lib/mosquitto
+      - /var/log/mosquitto
 
 - name: "Setup mosquitto config"
   template:
@@ -253,7 +258,8 @@
   expect:
       command: mosquitto_passwd -c /etc/mosquitto/passwd smartclassroom
       responses:
-          (?i):password: item.stdout_lines[2]
+          'Password: ': item.stdout_lines[2]
+          'Reenter password: ': item.stdout_lines[2]
   with_items: "{{ passwords.results }}"
   when: "{{ item.item.smart_classroom }} is defined and {{ item.item.smart_classroom }} and not {{ config_file.stat.exists }}"
 

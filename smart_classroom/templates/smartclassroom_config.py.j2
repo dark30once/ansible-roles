@@ -16,10 +16,10 @@ MQTT_BROKER_URL = 'localhost'
 MQTT_BROKER_PORT = 1883
 MQTT_USERNAME = 'smartclassroom'
 MQTT_PASSWORD = '{{ item.stdout_lines[2] }}'
-{% if item.use_https %}
+{% if item.item.use_https %}
 MQTT_TLS_ENABLED = True
 MQTT_TLS_INSECURE = True
-MQTT_CA_CERTS = '/etc/letsencrypt/live/{{ item.servername }}/chain.pem'
+MQTT_CA_CERTS = '/etc/letsencrypt/live/{{ item.item.servername }}/chain.pem'
 {% endif %}
 
 #SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:machineLearning2067@localhost/rfid'
