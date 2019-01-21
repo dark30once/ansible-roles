@@ -5,9 +5,9 @@ persistence_location /var/lib/mosquitto/
 allow_anonymous false
 password_file /etc/mosquitto/passwd
 {% if item.use_https %}
-cafile = /etc/letsencrypt/live/{{ item.servername }}/chain.pem
-certfile = /etc/letsencrypt/live/{{ item.servername }}/cert.pem
-keyfile = /etc/letsencrypt/live/{{ item.servername }}/privkey.pem
+cafile = /etc/mosquitto/{{ item.servername }}_ca.crt
+certfile = /etc/mosquitto/{{ item.servername }}.crt
+keyfile = /etc/mosquitto/{{ item.servername }}.key
 require_certificate false
 {% endif %}
 

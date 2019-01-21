@@ -244,6 +244,23 @@
       - /var/lib/mosquitto
       - /var/log/mosquitto
 
+- name: "copy ca certificate"
+  shell: "cp /etc/letsencrypt/live/{{ item.servername }}/chain.pem /etc/mosquitto/{{ item.servername }}_ca.crt"
+
+- name: "copy server certificate"
+  shell: "cp /etc/letsencrypt/live/{{ item.servername }}/cert.pem /etc/mosquitto/{{ item.servername }}.crt"
+
+- name: "copy server key"
+  shell: "cp /etc/letsencrypt/live/{{ item.servername }}/privkey.pem /etc/mosquitto/{{ item.servername }}.key"
+
+- name: mosquitto permissions
+  file:
+      dest: /etc/mosquitto
+      recurse: yes
+      owner: mosquitto
+      group: root
+      mode: "u+r,g+r,o+r"
+
 - name: "Setup mosquitto config"
   template:
       src: "mosquitto.conf.j2"
