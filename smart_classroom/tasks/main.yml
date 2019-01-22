@@ -199,6 +199,13 @@
       mode: 0444
   notify: reload circus
 
+- name: "Load data into database"
+  shell: 'PYTHONPATH=".:/home/{{ smartclassroom_user }}/.virtualenvs/smartclassroom/lib/python3.4" /home/{{ smartclassroom_user }}/.virtualenvs/smartclassroom/bin/python load_data.py'
+  args:
+    chdir: /srv/smartclassroom_backend
+  when: mysql_db_created.changed
+  notify: reload circus
+
 - name: allow 1886 (mosquitto) in iptables public input
   iptables: 
       chain: "{{ iptables_input_chain }}"
