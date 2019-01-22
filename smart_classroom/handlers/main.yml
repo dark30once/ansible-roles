@@ -9,3 +9,8 @@
   service:
     name: nginx
     state: restarted
+
+- name: reload mosquitto
+  service:
+    name: mosquitto
+    state: restarted

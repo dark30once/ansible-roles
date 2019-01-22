@@ -175,6 +175,11 @@
       path: "/srv/smartclassroom_backend/instance/config.py"
   register: config_file
 
+- name: "Check for existing mosquitto ca"
+  stat:
+      path: "/etc/mosquitto/ca.crt"
+  register: mosquitto_ca_file
+
 - name: "Setup smart classroom config"
   template:
       src: "smartclassroom_config.py.j2"
@@ -244,14 +249,19 @@
       - /var/lib/mosquitto
       - /var/log/mosquitto
 
-- name: "copy ca certificate"
-  shell: "cp /etc/letsencrypt/live/{{ item.servername }}/chain.pem /etc/mosquitto/{{ item.servername }}_ca.crt"
+- name: "make ca key"
+  shell: "openssl genrsa -out /etc/mosquitto/ca.key 2048"
+  when: not mosquitto_ca_file.stat.exists
 
-- name: "copy server certificate"
-  shell: "cp /etc/letsencrypt/live/{{ item.servername }}/cert.pem /etc/mosquitto/{{ item.servername }}.crt"
+- name: "make ca certificate"
+  shell: "openssl req -extensions v3_ca -days 36500 -new -x509 -key /etc/mosquitto/ca.key -out /etc/mosquitto/ca.crt -subj '/C=PH/ST=Negros Oriental/L=Dumaguete City/O=Foundation University/OU=Nightowl/CN=smart-classroom-ca.foundationu.com'"
+  when: not mosquitto_ca_file.stat.exists
 
-- name: "copy server key"
-  shell: "cp /etc/letsencrypt/live/{{ item.servername }}/privkey.pem /etc/mosquitto/{{ item.servername }}.key"
+- name: "makey server key and csr"
+  shell: "openssl req -nodes -newkey rsa:2048 -keyout /etc/mosquitto/mosquitto.key -out /etc/mosquitto/mosquitto.csr -subj '/C=PH/ST=Negros Oriental/L=Dumaguete City/O=Foundation University/OU=Nightowl/CN=smart-classroom-mosquitto.foundationu.com'"
+
+- name: "sign server csr"
+  shell: "openssl x509 -req -in /etc/mosquitto/mosquitto.csr -CA /etc/mosquitto/ca.crt -CAkey /etc/mosquitto/ca.key -CAcreateserial -out /etc/mosquitto/mosquitto.crt"
 
 - name: mosquitto permissions
   file:
@@ -270,6 +280,7 @@
       mode: 0444
   with_items: "{{ nginx_vhosts }}"
   when: "{{ item.smart_classroom }} is defined and {{ item.smart_classroom }}"  
+  notify: reload mosquitto
 
 - name: "Setup mosquitto password"
   expect:
@@ -279,6 +290,7 @@
           'Reenter password: ': item.stdout_lines[2]
   with_items: "{{ passwords.results }}"
   when: "{{ item.item.smart_classroom }} is defined and {{ item.item.smart_classroom }} and not {{ config_file.stat.exists }}"
+  notify: reload mosquitto
 
 - name: mosquitto service state
   service: name=mosquitto state=started enabled=yes
