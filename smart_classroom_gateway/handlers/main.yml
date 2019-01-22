@@ -1,0 +1,9 @@
+- name: reload hostapd
+  service:
+      name: hostapd
+      state: restarted
+
+- name: reload nodered
+  service:
+      name: nodered
+      state: restarted

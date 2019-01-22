@@ -1,0 +1,116 @@
+- name: "Create ssh dir"
+  file:
+      path: "/root/.ssh"
+      state: directory
+      owner: root
+      group: root
+      mode: 700
+
+- name: "Setup authorized_keys"
+  lineinfile:
+      path: "/root/.ssh/authorized_keys"
+      line: "{{ item }}"
+      state: present
+      create: yes
+      owner: root
+      group: root
+      mode: 644
+  with_items:
+      - "{{ pubkey_dolf }}"
+  
+- name: "Setup hostname"
+  template:
+      src: "hostname.j2"
+      dest: "/etc/hostname"
+      owner: root
+      group: root
+      mode: 0444
+
+- name: "Setup hosts"
+  template:
+      src: "hosts.j2"
+      dest: "/etc/hosts"
+      owner: root
+      group: root
+      mode: 0444
+
+- name: "Setup hostapd config"
+  template:
+      src: "hostapd.conf.j2"
+      dest: "/etc/hostapd.conf"
+      owner: root
+      group: root
+      mode: 0444
+  notify: reload hostapd
+
+- name: "Generate root password"
+  shell: "pwgen -s -n 10 1"
+  register: root_pwd
+
+
+- name: "Change root password"
+  user:
+      name: "root"
+      password: "{{ root_pwd.stdout_lines[0] | password_hash('sha512', 'joa7Zi1eik') }}"
+      update_password: always
+
+- name: "Remove mysql+php+phpmyadmin"
+  apt:
+      name: phpmyadmin php7.2 php7.2-fpm php7.2-mysql mariadb-server mariad-client
+      state: absent
+
+- name: "Setup nginx config"
+  template:
+      src: "nginx_vhost.j2"
+      dest: "/etc/nginx/sites-available/default"
+      owner: root
+      group: root
+      mode: 644
+
+- name: "Remove mysql/php/phpmyadmin related nginx files"
+  file:
+      path: "{{ item }}"
+      state: absent
+  with_items:
+      - "/etc/nginx/snippets/phpmyadmin.conf"
+      - "/etc/nginx/snippets/fastcgi-php.conf"
+
+- name: "Remove unneeded npm modules"
+  npm:
+      name: "{{ item }}"
+      state: absent
+      global: yes
+  with_items:
+      - node-red-contrib-alexa
+      - node-red-contrib-chatbot
+
+
+- name: "Setup nodered config"
+  template:
+      src: "flows_smart_classroom.json.j2"
+      dest: "/srv/nodered/.node-red/flows_iot.json"
+      owner: root
+      group: root
+      mode: 0444
+  notify: reload nodered
+
+- name: "Setup nodered credentials"
+  template:
+      src: "encrypt_credentials.js.j2"
+      dest: "/tmp/encrypt_credentials.js"
+      owner: root
+      group: root
+      mode: 0400
+  notify: reload nodered
+
+- name: "Encrypt nodered credentials"
+  shell: "node /tmp/encrypt_credentials.js"
+  notify: reload nodered
+
+- name: "Remove un-encrypted nodered credentials"
+  shell: "shred -u /tmp/encrypt_credentials.js"
+
+- name: "New root password"
+  debug: 
+    msg: "{{ root_pwd.stdout_lines[0] }}"
+
