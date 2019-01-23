@@ -1,3 +1,10 @@
+- name: "Set timezone"
+  shell: "{{ item }}"
+  with_items: 
+    - "echo \"Asia/Manila\" > /etc/timezone"
+    - "ln -fs /usr/share/zoneinfo/`cat /etc/timezone` /etc/localtime"
+    - "dpkg-reconfigure -f noninteractive tzdata"
+
 - name: "Create ssh dir"
   file:
       path: "/root/.ssh"
