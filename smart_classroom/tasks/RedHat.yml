@@ -2,8 +2,7 @@
 # RedHat/Centos specific tasks
 
 - name: Install RedHat Requirements
-  yum: name={{ item }} state=latest 
-  with_items:
-      - redis
-      - mosquitto
+  yum: 
+    name: redis, mosquitto
+    state: latest 
 
