@@ -1,0 +1,5 @@
+---
+# RedHat/Centos specific tasks
+
+- name: Install RedHat Requirements
+  yum: name="dhcp" state=latest 

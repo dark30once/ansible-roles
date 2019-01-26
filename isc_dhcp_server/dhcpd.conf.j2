@@ -1,0 +1,14 @@
+option domain-name "foundationu.com";
+option domain-name-servers 10.99.0.230, 10.99.2.230;
+
+default-lease-time 3600;
+max-lease-time 7200;
+
+authoritative;
+log-facility local7;
+
+subnet 10.99.64.0 netmask 255.255.240.0 {
+    range 10.99.64.11 10.99.78.255;
+    option routers 10.99.64.1;
+}
+
