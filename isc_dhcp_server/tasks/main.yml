@@ -18,6 +18,14 @@
       group: root
       mode: 644
 
+- name: "Copy static leases config"
+  template:
+      src: "static_leases.conf.j2"
+      dest: "/etc/dhcp/static_leases.conf"
+      owner: root
+      group: root
+      mode: 644
+
 - name: allow dhcpd in iptables public input
   iptables: 
       chain: "{{ iptables_input_chain }}"

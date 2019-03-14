@@ -61,11 +61,11 @@
   shell: "openssl req -extensions v3_ca -days 36500 -new -x509 -key /etc/mosquitto/ca.key -out /etc/mosquitto/ca.crt -subj '/C=PH/ST=Negros Oriental/L=Dumaguete City/O=Foundation University/OU=Nightowl/CN=smart-classroom-ca.foundationu.com'"
   when: not mosquitto_ca_file.stat.exists
 
-- name: "makey server key and csr"
-  shell: "openssl req -nodes -newkey rsa:2048 -keyout /etc/mosquitto/mosquitto.key -out /etc/mosquitto/mosquitto.csr -subj '/C=PH/ST=Negros Oriental/L=Dumaguete City/O=Foundation University/OU=Nightowl/CN=smart-classroom.foundationu.com'"
+- name: "make server key and csr"
+  shell: "openssl req -days 36500 -nodes -newkey rsa:2048 -keyout /etc/mosquitto/mosquitto.key -out /etc/mosquitto/mosquitto.csr -subj '/C=PH/ST=Negros Oriental/L=Dumaguete City/O=Foundation University/OU=Nightowl/CN=smart-classroom.foundationu.com'"
 
 - name: "sign server csr"
-  shell: "openssl x509 -req -in /etc/mosquitto/mosquitto.csr -CA /etc/mosquitto/ca.crt -CAkey /etc/mosquitto/ca.key -CAcreateserial -out /etc/mosquitto/mosquitto.crt"
+  shell: "openssl x509 -days 36500 -req -in /etc/mosquitto/mosquitto.csr -CA /etc/mosquitto/ca.crt -CAkey /etc/mosquitto/ca.key -CAcreateserial -out /etc/mosquitto/mosquitto.crt"
 
 - name: mosquitto permissions
   file:

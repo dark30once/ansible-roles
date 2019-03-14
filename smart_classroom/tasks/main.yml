@@ -36,6 +36,15 @@
       path: /home/{{ smartclassroom_user }}/.virtualenvs/smartclassroom
   register: virtualenv
 
+- name: Install python3 packages
+  pip:
+      executable: pip3
+      state: present
+      name: ['pexpect', 'virtualenv', 'virtualenvwrapper']
+
+- name: Install python packages
+  pip: executable=pip state=present name=pexpect
+
 - name: Include mosquitto
   include: mosquitto.yml
 
@@ -63,13 +72,6 @@
     mysql_uri: "mysql+pymysql://smart_classroom:{{ item.stdout_lines[0] }}@localhost/smart_classroom"
   with_items: "{{ passwords.results }}"
   when: "{{ item.item.smart_classroom }} is defined and {{ item.item.smart_classroom }}"
-
-- name: Install python3 packages
-  pip: executable=pip3 name={{ item }} state=present
-  with_items:
-      - virtualenv
-      - virtualenvwrapper
-      - pexpect
 
 - name: Install python packages
   pip: executable=pip name={{ item }} state=present
