@@ -62,7 +62,7 @@
   when: not mosquitto_ca_file.stat.exists
 
 - name: "make server key and csr"
-  shell: "openssl req -days 36500 -nodes -newkey rsa:2048 -keyout /etc/mosquitto/mosquitto.key -out /etc/mosquitto/mosquitto.csr -subj '/C=PH/ST=Negros Oriental/L=Dumaguete City/O=Foundation University/OU=Nightowl/CN=smart-classroom.foundationu.com'"
+  shell: "openssl req -days 36500 -nodes -newkey rsa:2048 -keyout /etc/mosquitto/mosquitto.key -out /etc/mosquitto/mosquitto.csr -subj '/C=PH/ST=Negros Oriental/L=Dumaguete City/O=Foundation University/OU=Nightowl/CN={{ servername }}'"
 
 - name: "sign server csr"
   shell: "openssl x509 -days 36500 -req -in /etc/mosquitto/mosquitto.csr -CA /etc/mosquitto/ca.crt -CAkey /etc/mosquitto/ca.key -CAcreateserial -out /etc/mosquitto/mosquitto.crt"

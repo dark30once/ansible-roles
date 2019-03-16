@@ -146,6 +146,14 @@
       owner: "{{ nginx_user }}"
       group: "{{ nginx_group }}"
 
+- name: Setup fs updates
+  file:
+      path: /srv/www/vhosts/updates
+      state: directory
+      recurse: yes
+      owner: "{{ nginx_user }}"
+      group: "{{ nginx_group }}"
+
 - name: Setup fs backend instance
   file:
       path: /srv/smartclassroom_backend/instance
