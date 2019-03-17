@@ -1,733 +1,818 @@
 [
-    {
-        "id": "e0d8c7c9.8b2758",
-        "type": "tab",
-        "label": "Smart-Classroom",
-        "disabled": false,
-        "info": ""
-    },
-    {
-        "id": "2d009164.ac916e",
-        "type": "mqtt-broker",
-        "z": "",
-        "name": "room mqqt server",
-        "broker": "10.7.1.1",
-        "port": "1883",
-        "tls": "",
-        "clientid": "",
-        "usetls": false,
-        "compatmode": true,
-        "keepalive": "60",
-        "cleansession": true,
-        "birthTopic": "",
-        "birthQos": "0",
-        "birthPayload": "",
-        "closeTopic": "",
-        "closePayload": "",
-        "willTopic": "",
-        "willQos": "0",
-        "willPayload": ""
-    },
-    {
-        "id": "c1d3de12.60f1a",
-        "type": "tls-config",
-        "z": "",
-        "name": "MQTT Server SSL",
-        "cert": "",
-        "key": "",
-        "ca": "",
-        "certname": "",
-        "keyname": "",
-        "caname": "ca.crt",
-        "servername": "",
-        "verifyservercert": true
-    },
-    {
-        "id": "181cef13.376c41",
-        "type": "ui_tab",
-        "z": "",
-        "name": "{{roomname}}",
-        "icon": "dashboard",
-        "order": "1"
-    },
-    {
-        "id": "e45e0195.a7594",
-        "type": "ui_group",
-        "z": "",
-        "name": "Door",
-        "tab": "181cef13.376c41",
-        "order": 1,
-        "disp": true,
-        "width": "6",
-        "collapse": false
-    },
-    {
-        "id": "c3200915.c884a",
-        "type": "ui_group",
-        "z": "",
-        "name": "Aircon",
-        "tab": "181cef13.376c41",
-        "order": 2,
-        "disp": true,
-        "width": "6"
-    },
-    {
-        "id": "3b2cb317.d09e94",
-        "type": "ui_group",
-        "z": "",
-        "name": "Lights",
-        "tab": "181cef13.376c41",
-        "order": 3,
-        "disp": true,
-        "width": "6"
-    },
-    {
-        "id": "5936ae19.a08de8",
-        "type": "ui_group",
-        "z": "",
-        "name": "Charts",
-        "tab": "181cef13.376c41",
-        "disp": true,
-        "width": "6",
-        "collapse": false
-    },
-    {
-        "id": "12654b14.cb0e8d",
-        "type": "ui_base",
-        "theme": {
-            "name": "theme-light",
-            "angularTheme": {
-                "primary": "indigo",
-                "accents": "blue",
-                "warn": "red",
-                "background": "grey"
-            },
-            "lightTheme": {
-                "default": "#0094CE",
-                "baseColor": "#0094CE",
-                "edited": true,
-                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
-                "reset": false
-            },
-            "customTheme": {
-                "default": "#4B7930",
-                "baseColor": "#4B7930",
-                "name": "Untitled Theme 1",
-                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
-            },
-            "themeState": {
-                "page-titlebar-backgroundColor": {
-                    "edited": false,
-                    "value": "#0094CE"
-                },
-                "page-backgroundColor": {
-                    "edited": false,
-                    "value": "#fafafa"
-                },
-                "widget-backgroundColor": {
-                    "edited": false,
-                    "value": "#0094ce"
-                },
-                "page-sidebar-backgroundColor": {
-                    "edited": false,
-                    "value": "#ffffff"
-                },
-                "widget-textColor": {
-                    "edited": false,
-                    "value": "#111111"
-                },
-                "group-backgroundColor": {
-                    "edited": false,
-                    "value": "#ffffff"
-                },
-                "base-font": {
-                    "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
-                },
-                "group-textColor": {
-                    "edited": false,
-                    "value": "#1bbfff"
-                },
-                "widget-borderColor": {
-                    "edited": false,
-                    "value": "#ffffff"
-                },
-                "group-borderColor": {
-                    "edited": false,
-                    "value": "#ffffff"
-                },
-                "base-color": {
-                    "default": "#0094CE",
-                    "edited": false,
-                    "value": "#0094CE"
-                }
-            },
-            "darkTheme": {
-                "default": "#097479",
-                "baseColor": "#097479",
-                "edited": false,
-                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
-            }
+  {
+    "id": "e0d8c7c9.8b2758",
+    "type": "tab",
+    "label": "Smart-Classroom",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "2d009164.ac916e",
+    "type": "mqtt-broker",
+    "z": "",
+    "name": "room mqqt server",
+    "broker": "10.7.1.1",
+    "port": "1883",
+    "tls": "",
+    "clientid": "",
+    "usetls": false,
+    "compatmode": true,
+    "keepalive": "60",
+    "cleansession": true,
+    "birthTopic": "",
+    "birthQos": "0",
+    "birthPayload": "",
+    "closeTopic": "",
+    "closePayload": "",
+    "willTopic": "",
+    "willQos": "0",
+    "willPayload": ""
+  },
+  {
+    "id": "c1d3de12.60f1a",
+    "type": "tls-config",
+    "z": "",
+    "name": "MQTT Server SSL",
+    "cert": "",
+    "key": "",
+    "ca": "",
+    "certname": "",
+    "keyname": "",
+    "caname": "ca.crt",
+    "servername": "",
+    "verifyservercert": true
+  },
+  {
+    "id": "181cef13.376c41",
+    "type": "ui_tab",
+    "z": "",
+    "name": "{{roomname}}",
+    "icon": "dashboard",
+    "order": "1"
+  },
+  {
+    "id": "e45e0195.a7594",
+    "type": "ui_group",
+    "z": "",
+    "name": "Door",
+    "tab": "181cef13.376c41",
+    "order": 1,
+    "disp": true,
+    "width": "6",
+    "collapse": false
+  },
+  {
+    "id": "c3200915.c884a",
+    "type": "ui_group",
+    "z": "",
+    "name": "Aircon",
+    "tab": "181cef13.376c41",
+    "order": 2,
+    "disp": true,
+    "width": "6"
+  },
+  {
+    "id": "3b2cb317.d09e94",
+    "type": "ui_group",
+    "z": "",
+    "name": "Lights",
+    "tab": "181cef13.376c41",
+    "order": 3,
+    "disp": true,
+    "width": "6"
+  },
+  {
+    "id": "5936ae19.a08de8",
+    "type": "ui_group",
+    "z": "",
+    "name": "Charts",
+    "tab": "181cef13.376c41",
+    "disp": true,
+    "width": "6",
+    "collapse": false
+  },
+  {
+    "id": "12654b14.cb0e8d",
+    "type": "ui_base",
+    "theme": {
+      "name": "theme-light",
+      "angularTheme": {
+        "primary": "indigo",
+        "accents": "blue",
+        "warn": "red",
+        "background": "grey"
+      },
+      "lightTheme": {
+        "default": "#0094CE",
+        "baseColor": "#0094CE",
+        "edited": true,
+        "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+        "reset": false
+      },
+      "customTheme": {
+        "default": "#4B7930",
+        "baseColor": "#4B7930",
+        "name": "Untitled Theme 1",
+        "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+      },
+      "themeState": {
+        "page-titlebar-backgroundColor": {
+          "edited": false,
+          "value": "#0094CE"
         },
-        "site": {
-            "name": "Node-RED Dashboard",
-            "dateFormat": "DD/MM/YYYY",
-            "sizes": {
-                "sy": 48,
-                "sx": 48,
-                "px": 0,
-                "py": 0,
-                "gy": 6,
-                "gx": 6,
-                "cy": 6,
-                "cx": 6
-            },
-            "hideToolbar": "false",
-            "allowTempTheme": "true",
-            "allowSwipe": "false"
+        "page-backgroundColor": {
+          "edited": false,
+          "value": "#fafafa"
+        },
+        "widget-backgroundColor": {
+          "edited": false,
+          "value": "#0094ce"
+        },
+        "page-sidebar-backgroundColor": {
+          "edited": false,
+          "value": "#ffffff"
+        },
+        "widget-textColor": {
+          "edited": false,
+          "value": "#111111"
+        },
+        "group-backgroundColor": {
+          "edited": false,
+          "value": "#ffffff"
+        },
+        "base-font": {
+          "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+        },
+        "group-textColor": {
+          "edited": false,
+          "value": "#1bbfff"
+        },
+        "widget-borderColor": {
+          "edited": false,
+          "value": "#ffffff"
+        },
+        "group-borderColor": {
+          "edited": false,
+          "value": "#ffffff"
+        },
+        "base-color": {
+          "default": "#0094CE",
+          "edited": false,
+          "value": "#0094CE"
         }
+      },
+      "darkTheme": {
+        "default": "#097479",
+        "baseColor": "#097479",
+        "edited": false,
+        "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+      }
     },
-    {
-        "id": "a5253b4d.32c858",
-        "type": "mqtt-broker",
-        "z": "",
-        "name": "main mqtt server",
-        "broker": "smart-classroom.foundationu.com",
-        "port": "1883",
-        "tls": "c1d3de12.60f1a",
-        "clientid": "{{hostname}}",
-        "usetls": true,
-        "compatmode": true,
-        "keepalive": "60",
-        "cleansession": true,
-        "birthTopic": "",
-        "birthQos": "0",
-        "birthPayload": "",
-        "closeTopic": "",
-        "closeQos": "0",
-        "closePayload": "",
-        "willTopic": "",
-        "willQos": "0",
-        "willPayload": ""
-    },
-    {
-        "id": "f747f04b.3f3ba",
-        "type": "tls-config",
-        "z": "",
-        "name": "Any HTTPS Server",
-        "cert": "",
-        "key": "",
-        "ca": "",
-        "certname": "",
-        "keyname": "",
-        "caname": "",
-        "servername": "",
-        "verifyservercert": true
-    },
-    {
-        "id": "80c054fc.720c88",
-        "type": "mqtt in",
-        "z": "e0d8c7c9.8b2758",
-        "name": "",
-        "topic": "smartclassroom/Door/cardread",
-        "qos": "2",
-        "broker": "2d009164.ac916e",
-        "x": 162,
-        "y": 204,
-        "wires": [
-            [
-                "df155899.585c4"
-            ]
-        ]
-    },
-    {
-        "id": "e11fd458.3cf228",
-        "type": "http request",
-        "z": "e0d8c7c9.8b2758",
-        "name": "",
-        "method": "GET",
-        "ret": "obj",
-        "url": "",
-        "tls": "f747f04b.3f3ba",
-        "x": 570,
-        "y": 203,
-        "wires": [
-            [
-                "91ab0ee9.f4f908"
-            ]
-        ]
-    },
-    {
-        "id": "df155899.585c4",
-        "type": "function",
-        "z": "e0d8c7c9.8b2758",
-        "name": "",
-        "func": "msg.url=\"https://smart-classroom.foundationu.com/api/checkTag/{{roomname}}/\"+msg.payload+\"0000\";\nmsg.payload=\"\";\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "x": 404,
-        "y": 203,
-        "wires": [
-            [
-                "e11fd458.3cf228"
-            ]
-        ]
-    },
-    {
-        "id": "91ab0ee9.f4f908",
-        "type": "switch",
-        "z": "e0d8c7c9.8b2758",
-        "name": "",
-        "property": "payload.access",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "vt": "str",
-                "t": "eq",
-                "v": "granted"
-            },
-            {
-                "vt": "str",
-                "t": "eq",
-                "v": "denied"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 2,
-        "x": 738,
-        "y": 203,
-        "wires": [
-            [
-                "f7aa0dd8.f35d78",
-                "bfcb7d2f.608a4"
-            ],
-            [
-                "d8724940.85c38"
-            ]
-        ]
-    },
-    {
-        "id": "f7aa0dd8.f35d78",
-        "type": "template",
-        "z": "e0d8c7c9.8b2758",
-        "name": "",
-        "field": "payload",
-        "fieldType": "msg",
-        "format": "handlebars",
-        "syntax": "plain",
-        "template": "true",
-        "output": "str",
-        "x": 933,
-        "y": 159,
-        "wires": [
-            [
-                "6574de1.331c4a"
-            ]
-        ]
-    },
-    {
-        "id": "bfcb7d2f.608a4",
-        "type": "function",
-        "z": "e0d8c7c9.8b2758",
-        "name": "",
-        "func": "msg.payload=true;\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "x": 928,
-        "y": 101,
-        "wires": [
-            [
-                "133456e9.3e0949"
-            ]
-        ]
-    },
-    {
-        "id": "133456e9.3e0949",
-        "type": "ui_switch",
-        "z": "e0d8c7c9.8b2758",
-        "name": "Lights on/off",
-        "label": "Lights on/off",
-        "group": "3b2cb317.d09e94",
-        "order": 1,
-        "width": "",
-        "height": "",
-        "passthru": true,
-        "decouple": "false",
-        "topic": "",
-        "onvalue": "true",
-        "onvalueType": "str",
-        "onicon": "",
-        "oncolor": "",
-        "offvalue": "false",
-        "offvalueType": "str",
-        "officon": "",
-        "offcolor": "",
-        "x": 1092,
-        "y": 101,
-        "wires": [
-            [
-                "58d6d8a2.b3ee5"
-            ]
-        ]
-    },
-    {
-        "id": "d7b9cd98.f57b98",
-        "type": "ui_gauge",
-        "z": "e0d8c7c9.8b2758",
-        "name": "SET TEMP",
-        "group": "c3200915.c884a",
-        "order": 4,
-        "width": "",
-        "height": "",
-        "gtype": "gage",
-        "title": "SET TEMP",
-        "label": "\u00b0C",
-        "format": "{{'{{'}}value}}",
-        "min": "16",
-        "max": "26",
-        "colors": [
-            "#0080ff",
-            "#e6e600",
-            "#ca3838"
-        ],
-        "seg1": "",
-        "seg2": "",
-        "x": 1223,
-        "y": 462,
-        "wires": []
-    },
-    {
-        "id": "f5391828.aaf4b",
-        "type": "ui_switch",
-        "z": "e0d8c7c9.8b2758",
-        "name": "Aircon on/off",
-        "label": "Aircon on/off",
-        "group": "c3200915.c884a",
-        "order": 1,
-        "width": "",
-        "height": "",
-        "passthru": true,
-        "decouple": "false",
-        "topic": "",
-        "onvalue": "true",
-        "onvalueType": "str",
-        "onicon": "",
-        "oncolor": "",
-        "offvalue": "false",
-        "offvalueType": "str",
-        "officon": "",
-        "offcolor": "",
-        "x": 97,
-        "y": 586,
-        "wires": [
-            [
-                "561ee51.4d9269c"
-            ]
-        ]
-    },
-    {
-        "id": "6755c00.25903c",
-        "type": "ui_dropdown",
-        "z": "e0d8c7c9.8b2758",
-        "name": "",
-        "label": "Temp",
-        "place": "Select Temp",
-        "group": "c3200915.c884a",
-        "order": 2,
-        "width": 0,
-        "height": 0,
-        "passthru": true,
-        "options": [
-            {
-                "type": "num",
-                "value": 16,
-                "label": "16 \u00b0C"
-            },
-            {
-                "type": "num",
-                "value": 17,
-                "label": "17 \u00b0C"
-            },
-            {
-                "type": "num",
-                "value": 18,
-                "label": "18 \u00b0C"
-            },
-            {
-                "type": "num",
-                "value": 19,
-                "label": "19 \u00b0C"
-            },
-            {
-                "type": "num",
-                "value": 20,
-                "label": "20 \u00b0C"
-            },
-            {
-                "type": "num",
-                "value": 21,
-                "label": "21 \u00b0C"
-            },
-            {
-                "type": "num",
-                "value": 22,
-                "label": "22 \u00b0C"
-            },
-            {
-                "type": "num",
-                "value": 23,
-                "label": "23 \u00b0C"
-            },
-            {
-                "type": "num",
-                "value": 24,
-                "label": "24 \u00b0C"
-            },
-            {
-                "type": "num",
-                "value": 25,
-                "label": "25 \u00b0C"
-            },
-            {
-                "type": "num",
-                "value": 26,
-                "label": "26 \u00b0C"
-            }
-        ],
-        "payload": "",
-        "topic": "",
-        "x": 588,
-        "y": 510,
-        "wires": [
-            [
-                "d7b9cd98.f57b98",
-                "b092b1f8.1e38f8"
-            ]
-        ]
-    },
-    {
-        "id": "65ab265a.9b2d18",
-        "type": "mqtt out",
-        "z": "e0d8c7c9.8b2758",
-        "name": "",
-        "topic": "",
-        "qos": "0",
-        "retain": "",
-        "broker": "2d009164.ac916e",
-        "x": 1422,
-        "y": 61,
-        "wires": []
-    },
-    {
-        "id": "58d6d8a2.b3ee5",
-        "type": "function",
-        "z": "e0d8c7c9.8b2758",
-        "name": "",
-        "func": "msg.topic = 'smartclassroom/Lights/on'\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "x": 1270,
-        "y": 62,
-        "wires": [
-            [
-                "65ab265a.9b2d18"
-            ]
-        ]
-    },
-    {
-        "id": "6574de1.331c4a",
-        "type": "mqtt out",
-        "z": "e0d8c7c9.8b2758",
-        "name": "",
-        "topic": "smartclassroom/Door/open",
-        "qos": "0",
-        "retain": "",
-        "broker": "2d009164.ac916e",
-        "x": 1360,
-        "y": 270,
-        "wires": []
-    },
-    {
-        "id": "561ee51.4d9269c",
-        "type": "mqtt out",
-        "z": "e0d8c7c9.8b2758",
-        "name": "",
-        "topic": "smartclassroom/Aircon/on",
-        "qos": "0",
-        "retain": "",
-        "broker": "2d009164.ac916e",
-        "x": 1306,
-        "y": 636,
-        "wires": []
-    },
-    {
-        "id": "e8ecef72.a7121",
-        "type": "mqtt in",
-        "z": "e0d8c7c9.8b2758",
-        "name": "",
-        "topic": "smartclassroom/{{roomname}}/Lights/on",
-        "qos": "2",
-        "broker": "a5253b4d.32c858",
-        "x": 166,
-        "y": 62,
-        "wires": [
-            [
-                "58d6d8a2.b3ee5"
-            ]
-        ]
-    },
-    {
-        "id": "efd63962.8183d8",
-        "type": "mqtt in",
-        "z": "e0d8c7c9.8b2758",
-        "name": "",
-        "topic": "smartclassroom/{{roomname}}/Aircon/on",
-        "qos": "2",
-        "broker": "a5253b4d.32c858",
-        "x": 168,
-        "y": 660,
-        "wires": [
-            [
-                "561ee51.4d9269c"
-            ]
-        ]
-    },
-    {
-        "id": "f3373be9.1992d8",
-        "type": "mqtt in",
-        "z": "e0d8c7c9.8b2758",
-        "name": "",
-        "topic": "smartclassroom/{{roomname}}/Aircon temperature/on",
-        "qos": "2",
-        "broker": "a5253b4d.32c858",
-        "x": 216,
-        "y": 499,
-        "wires": [
-            [
-                "6755c00.25903c"
-            ]
-        ]
-    },
-    {
-        "id": "bf7d31c.4ed135",
-        "type": "mqtt in",
-        "z": "e0d8c7c9.8b2758",
-        "name": "",
-        "topic": "smartclassroom/{{roomname}}/Door/open",
-        "qos": "2",
-        "broker": "a5253b4d.32c858",
-        "x": 181,
-        "y": 272,
-        "wires": [
-            [
-                "d5ca4b98.9b4e38"
-            ]
-        ]
-    },
-    {
-        "id": "d8724940.85c38",
-        "type": "template",
-        "z": "e0d8c7c9.8b2758",
-        "name": "",
-        "field": "payload",
-        "fieldType": "msg",
-        "format": "handlebars",
-        "syntax": "plain",
-        "template": "false",
-        "output": "str",
-        "x": 934,
-        "y": 205,
-        "wires": [
-            [
-                "6574de1.331c4a"
-            ]
-        ]
-    },
-    {
-        "id": "b092b1f8.1e38f8",
-        "type": "mqtt out",
-        "z": "e0d8c7c9.8b2758",
-        "name": "",
-        "topic": "smartclassroom/Aircon temperature/on",
-        "qos": "0",
-        "retain": "",
-        "broker": "2d009164.ac916e",
-        "x": 1316,
-        "y": 508,
-        "wires": []
-    },
-    {
-        "id": "1c5e93cf.b663ac",
-        "type": "mqtt in",
-        "z": "e0d8c7c9.8b2758",
-        "name": "",
-        "topic": "smartclassroom/Door/announce/open",
-        "qos": "2",
-        "broker": "2d009164.ac916e",
-        "x": 179,
-        "y": 383,
-        "wires": [
-            [
-                "9ad6c96b.47fef"
-            ]
-        ]
-    },
-    {
-        "id": "bb5b919d.0e83d8",
-        "type": "mqtt out",
-        "z": "e0d8c7c9.8b2758",
-        "name": "",
-        "topic": "",
-        "qos": "0",
-        "retain": "",
-        "broker": "a5253b4d.32c858",
-        "x": 1400,
-        "y": 375,
-        "wires": []
-    },
-    {
-        "id": "9ad6c96b.47fef",
-        "type": "function",
-        "z": "e0d8c7c9.8b2758",
-        "name": "",
-        "func": "msg.topic = 'smartclassroom/{{roomname}}/Door/open';\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "x": 536,
-        "y": 379,
-        "wires": [
-            [
-                "bb5b919d.0e83d8"
-            ]
-        ]
-    },
-    {
-        "id": "d5ca4b98.9b4e38",
-        "type": "ui_switch",
-        "z": "e0d8c7c9.8b2758",
-        "name": "Door open/closed",
-        "label": "Door open/closed",
-        "group": "e45e0195.a7594",
-        "order": 1,
-        "width": "",
-        "height": "",
-        "passthru": true,
-        "decouple": "false",
-        "topic": "",
-        "onvalue": "true",
-        "onvalueType": "str",
-        "onicon": "",
-        "oncolor": "",
-        "offvalue": "false",
-        "offvalueType": "str",
-        "officon": "",
-        "offcolor": "",
-        "x": 830,
-        "y": 271,
-        "wires": [
-            [
-                "6574de1.331c4a"
-            ]
-        ]
+    "site": {
+      "name": "Node-RED Dashboard",
+      "dateFormat": "DD/MM/YYYY",
+      "sizes": {
+        "sy": 48,
+        "sx": 48,
+        "px": 0,
+        "py": 0,
+        "gy": 6,
+        "gx": 6,
+        "cy": 6,
+        "cx": 6
+      },
+      "hideToolbar": "false",
+      "allowTempTheme": "true",
+      "allowSwipe": "false"
     }
+  },
+  {
+    "id": "a5253b4d.32c858",
+    "type": "mqtt-broker",
+    "z": "",
+    "name": "main mqtt server",
+    "broker": "smart-classroom.foundationu.com",
+    "port": "1883",
+    "tls": "c1d3de12.60f1a",
+    "clientid": "{{hostname}}",
+    "usetls": true,
+    "compatmode": true,
+    "keepalive": "60",
+    "cleansession": true,
+    "birthTopic": "",
+    "birthQos": "0",
+    "birthPayload": "",
+    "closeTopic": "",
+    "closeQos": "0",
+    "closePayload": "",
+    "willTopic": "",
+    "willQos": "0",
+    "willPayload": ""
+  },
+  {
+    "id": "f747f04b.3f3ba",
+    "type": "tls-config",
+    "z": "",
+    "name": "Any HTTPS Server",
+    "cert": "",
+    "key": "",
+    "ca": "",
+    "certname": "",
+    "keyname": "",
+    "caname": "",
+    "servername": "",
+    "verifyservercert": true
+  },
+  {
+    "id": "80c054fc.720c88",
+    "type": "mqtt in",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "topic": "smartclassroom/Door/cardread",
+    "qos": "2",
+    "broker": "2d009164.ac916e",
+    "x": 150,
+    "y": 200,
+    "wires": [
+      [
+        "df155899.585c4",
+        "83682664.274d18"
+      ]
+    ]
+  },
+  {
+    "id": "e11fd458.3cf228",
+    "type": "http request",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "method": "GET",
+    "ret": "obj",
+    "url": "",
+    "tls": "f747f04b.3f3ba",
+    "x": 570,
+    "y": 203,
+    "wires": [
+      [
+        "91ab0ee9.f4f908",
+        "83682664.274d18"
+      ]
+    ]
+  },
+  {
+    "id": "df155899.585c4",
+    "type": "function",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "func": "msg.url=\"https://smart-classroom.foundationu.com/api/checkTag/{{roomname}}/\"+msg.payload+\"0000\";\nmsg.payload=\"\";\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 404,
+    "y": 203,
+    "wires": [
+      [
+        "e11fd458.3cf228"
+      ]
+    ]
+  },
+  {
+    "id": "91ab0ee9.f4f908",
+    "type": "switch",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "property": "payload.access",
+    "propertyType": "msg",
+    "rules": [
+      {
+        "vt": "str",
+        "t": "eq",
+        "v": "granted"
+      },
+      {
+        "vt": "str",
+        "t": "eq",
+        "v": "denied"
+      }
+    ],
+    "checkall": "true",
+    "repair": false,
+    "outputs": 2,
+    "x": 738,
+    "y": 203,
+    "wires": [
+      [
+        "f7aa0dd8.f35d78",
+        "bfcb7d2f.608a4"
+      ],
+      [
+        "d8724940.85c38"
+      ]
+    ]
+  },
+  {
+    "id": "f7aa0dd8.f35d78",
+    "type": "template",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "field": "payload",
+    "fieldType": "msg",
+    "format": "handlebars",
+    "syntax": "plain",
+    "template": "true",
+    "output": "str",
+    "x": 933,
+    "y": 159,
+    "wires": [
+      [
+        "6574de1.331c4a"
+      ]
+    ]
+  },
+  {
+    "id": "bfcb7d2f.608a4",
+    "type": "function",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "func": "msg.payload=true;\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 930,
+    "y": 120,
+    "wires": [
+      [
+        "133456e9.3e0949",
+        "9bd51815.ba39c8"
+      ]
+    ]
+  },
+  {
+    "id": "133456e9.3e0949",
+    "type": "ui_switch",
+    "z": "e0d8c7c9.8b2758",
+    "name": "Lights on/off",
+    "label": "Lights on/off",
+    "group": "3b2cb317.d09e94",
+    "order": 1,
+    "width": "",
+    "height": "",
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "onvalue": "true",
+    "onvalueType": "str",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "str",
+    "officon": "",
+    "offcolor": "",
+    "x": 1110,
+    "y": 60,
+    "wires": [
+      [
+        "65ab265a.9b2d18"
+      ]
+    ]
+  },
+  {
+    "id": "d7b9cd98.f57b98",
+    "type": "ui_gauge",
+    "z": "e0d8c7c9.8b2758",
+    "name": "SET TEMP",
+    "group": "c3200915.c884a",
+    "order": 4,
+    "width": "",
+    "height": "",
+    "gtype": "gage",
+    "title": "SET TEMP",
+    "label": "\u00b0C",
+    "format": "{{'{{'}}value}}",
+    "min": "16",
+    "max": "26",
+    "colors": [
+      "#0080ff",
+      "#e6e600",
+      "#ca3838"
+    ],
+    "seg1": "",
+    "seg2": "",
+    "x": 1223,
+    "y": 462,
+    "wires": []
+  },
+  {
+    "id": "f5391828.aaf4b",
+    "type": "ui_switch",
+    "z": "e0d8c7c9.8b2758",
+    "name": "Aircon on/off",
+    "label": "Aircon on/off",
+    "group": "c3200915.c884a",
+    "order": 1,
+    "width": "",
+    "height": "",
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "onvalue": "true",
+    "onvalueType": "str",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "str",
+    "officon": "",
+    "offcolor": "",
+    "x": 90,
+    "y": 600,
+    "wires": [
+      [
+        "561ee51.4d9269c"
+      ]
+    ]
+  },
+  {
+    "id": "6755c00.25903c",
+    "type": "ui_dropdown",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "label": "Temp",
+    "place": "Select Temp",
+    "group": "c3200915.c884a",
+    "order": 2,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "options": [
+      {
+        "type": "num",
+        "value": 16,
+        "label": "16 \u00b0C"
+      },
+      {
+        "type": "num",
+        "value": 17,
+        "label": "17 \u00b0C"
+      },
+      {
+        "type": "num",
+        "value": 18,
+        "label": "18 \u00b0C"
+      },
+      {
+        "type": "num",
+        "value": 19,
+        "label": "19 \u00b0C"
+      },
+      {
+        "type": "num",
+        "value": 20,
+        "label": "20 \u00b0C"
+      },
+      {
+        "type": "num",
+        "value": 21,
+        "label": "21 \u00b0C"
+      },
+      {
+        "type": "num",
+        "value": 22,
+        "label": "22 \u00b0C"
+      },
+      {
+        "type": "num",
+        "value": 23,
+        "label": "23 \u00b0C"
+      },
+      {
+        "type": "num",
+        "value": 24,
+        "label": "24 \u00b0C"
+      },
+      {
+        "type": "num",
+        "value": 25,
+        "label": "25 \u00b0C"
+      },
+      {
+        "type": "num",
+        "value": 26,
+        "label": "26 \u00b0C"
+      }
+    ],
+    "payload": "",
+    "topic": "",
+    "x": 588,
+    "y": 510,
+    "wires": [
+      [
+        "d7b9cd98.f57b98",
+        "b092b1f8.1e38f8"
+      ]
+    ]
+  },
+  {
+    "id": "65ab265a.9b2d18",
+    "type": "mqtt out",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "topic": "smartclassroom/Lights/on",
+    "qos": "0",
+    "retain": "",
+    "broker": "2d009164.ac916e",
+    "x": 1370,
+    "y": 60,
+    "wires": []
+  },
+  {
+    "id": "6574de1.331c4a",
+    "type": "mqtt out",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "topic": "smartclassroom/Door/open",
+    "qos": "0",
+    "retain": "",
+    "broker": "2d009164.ac916e",
+    "x": 1360,
+    "y": 280,
+    "wires": []
+  },
+  {
+    "id": "561ee51.4d9269c",
+    "type": "mqtt out",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "topic": "smartclassroom/Aircon/on",
+    "qos": "0",
+    "retain": "",
+    "broker": "2d009164.ac916e",
+    "x": 1360,
+    "y": 620,
+    "wires": []
+  },
+  {
+    "id": "e8ecef72.a7121",
+    "type": "mqtt in",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "topic": "smartclassroom/{{roomname}}/Lights/on",
+    "qos": "2",
+    "broker": "a5253b4d.32c858",
+    "x": 170,
+    "y": 60,
+    "wires": [
+      [
+        "133456e9.3e0949"
+      ]
+    ]
+  },
+  {
+    "id": "efd63962.8183d8",
+    "type": "mqtt in",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "topic": "smartclassroom/{{roomname}}/Aircon/on",
+    "qos": "2",
+    "broker": "a5253b4d.32c858",
+    "x": 170,
+    "y": 660,
+    "wires": [
+      [
+        "561ee51.4d9269c"
+      ]
+    ]
+  },
+  {
+    "id": "f3373be9.1992d8",
+    "type": "mqtt in",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "topic": "smartclassroom/{{roomname}}/Aircon temperature/on",
+    "qos": "2",
+    "broker": "a5253b4d.32c858",
+    "x": 210,
+    "y": 500,
+    "wires": [
+      [
+        "6755c00.25903c"
+      ]
+    ]
+  },
+  {
+    "id": "bf7d31c.4ed135",
+    "type": "mqtt in",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "topic": "smartclassroom/{{roomname}}/Door/open",
+    "qos": "2",
+    "broker": "a5253b4d.32c858",
+    "x": 170,
+    "y": 280,
+    "wires": [
+      [
+        "d5ca4b98.9b4e38"
+      ]
+    ]
+  },
+  {
+    "id": "d8724940.85c38",
+    "type": "template",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "field": "payload",
+    "fieldType": "msg",
+    "format": "handlebars",
+    "syntax": "plain",
+    "template": "false",
+    "output": "str",
+    "x": 934,
+    "y": 205,
+    "wires": [
+      [
+        "6574de1.331c4a"
+      ]
+    ]
+  },
+  {
+    "id": "b092b1f8.1e38f8",
+    "type": "mqtt out",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "topic": "smartclassroom/Aircon temperature/on",
+    "qos": "0",
+    "retain": "",
+    "broker": "2d009164.ac916e",
+    "x": 1316,
+    "y": 508,
+    "wires": []
+  },
+  {
+    "id": "1c5e93cf.b663ac",
+    "type": "mqtt in",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "topic": "smartclassroom/Door/announce/open",
+    "qos": "2",
+    "broker": "2d009164.ac916e",
+    "x": 170,
+    "y": 360,
+    "wires": [
+      [
+        "bb5b919d.0e83d8"
+      ]
+    ]
+  },
+  {
+    "id": "bb5b919d.0e83d8",
+    "type": "mqtt out",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "topic": "smartclassroom/{{roomname}}/Door/open",
+    "qos": "0",
+    "retain": "",
+    "broker": "a5253b4d.32c858",
+    "x": 1320,
+    "y": 360,
+    "wires": []
+  },
+  {
+    "id": "d5ca4b98.9b4e38",
+    "type": "ui_switch",
+    "z": "e0d8c7c9.8b2758",
+    "name": "Door open/closed",
+    "label": "Door open/closed",
+    "group": "e45e0195.a7594",
+    "order": 1,
+    "width": "",
+    "height": "",
+    "passthru": true,
+    "decouple": "false",
+    "topic": "",
+    "onvalue": "true",
+    "onvalueType": "str",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "false",
+    "offvalueType": "str",
+    "officon": "",
+    "offcolor": "",
+    "x": 810,
+    "y": 280,
+    "wires": [
+      [
+        "6574de1.331c4a"
+      ]
+    ]
+  },
+  {
+    "id": "83682664.274d18",
+    "type": "debug",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "false",
+    "x": 750,
+    "y": 80,
+    "wires": []
+  },
+  {
+    "id": "9bd51815.ba39c8",
+    "type": "mqtt out",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "topic": "smartclassroom/{{roomname}}/Lights/on",
+    "qos": "",
+    "retain": "",
+    "broker": "a5253b4d.32c858",
+    "x": 1330,
+    "y": 120,
+    "wires": []
+  },
+  {
+    "id": "c4fe4488.51e3b",
+    "type": "mqtt in",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "topic": "smartclassroom/Door/update",
+    "qos": "2",
+    "broker": "a5253b4d.32c858",
+    "x": 140,
+    "y": 860,
+    "wires": [
+      [
+        "903255c0.719c"
+      ]
+    ]
+  },
+  {
+    "id": "f91e656.3161098",
+    "type": "mqtt in",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "topic": "smartclassroom/Aircon/update",
+    "qos": "2",
+    "broker": "a5253b4d.32c858",
+    "x": 150,
+    "y": 920,
+    "wires": [
+      [
+        "98947e4c.79ac98"
+      ]
+    ]
+  },
+  {
+    "id": "a3641f2.2a3f36",
+    "type": "mqtt in",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "topic": "smartclassroom/Lights/update",
+    "qos": "2",
+    "broker": "a5253b4d.32c858",
+    "x": 150,
+    "y": 980,
+    "wires": [
+      [
+        "e0d489b5.9862d8"
+      ]
+    ]
+  },
+  {
+    "id": "903255c0.719c",
+    "type": "mqtt out",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "topic": "smartclassroom/Door/update",
+    "qos": "0",
+    "retain": "",
+    "broker": "2d009164.ac916e",
+    "x": 530,
+    "y": 860,
+    "wires": []
+  },
+  {
+    "id": "98947e4c.79ac98",
+    "type": "mqtt out",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "topic": "smartclassroom/Aircon/update",
+    "qos": "0",
+    "retain": "",
+    "broker": "2d009164.ac916e",
+    "x": 530,
+    "y": 920,
+    "wires": []
+  },
+  {
+    "id": "e0d489b5.9862d8",
+    "type": "mqtt out",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "topic": "smartclassroom/Ligths/update",
+    "qos": "0",
+    "retain": "",
+    "broker": "2d009164.ac916e",
+    "x": 530,
+    "y": 980,
+    "wires": []
+  }
 ]
