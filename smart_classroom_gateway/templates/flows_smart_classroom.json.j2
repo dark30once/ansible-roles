@@ -499,8 +499,8 @@
     ],
     "payload": "",
     "topic": "",
-    "x": 588,
-    "y": 510,
+    "x": 590,
+    "y": 500,
     "wires": [
       [
         "d7b9cd98.f57b98",
@@ -711,8 +711,8 @@
     "console": false,
     "tostatus": false,
     "complete": "false",
-    "x": 750,
-    "y": 80,
+    "x": 670,
+    "y": 100,
     "wires": []
   },
   {
@@ -740,7 +740,8 @@
     "y": 860,
     "wires": [
       [
-        "903255c0.719c"
+        "903255c0.719c",
+        "34f811e3.5277c6"
       ]
     ]
   },
@@ -756,7 +757,8 @@
     "y": 920,
     "wires": [
       [
-        "98947e4c.79ac98"
+        "98947e4c.79ac98",
+        "34f811e3.5277c6"
       ]
     ]
   },
@@ -772,7 +774,8 @@
     "y": 980,
     "wires": [
       [
-        "e0d489b5.9862d8"
+        "e0d489b5.9862d8",
+        "34f811e3.5277c6"
       ]
     ]
   },
@@ -813,6 +816,82 @@
     "broker": "2d009164.ac916e",
     "x": 530,
     "y": 980,
+    "wires": []
+  },
+  {
+    "id": "8ac1a788.e0162",
+    "type": "mqtt in",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "topic": "smartclassroom/connected",
+    "qos": "2",
+    "broker": "2d009164.ac916e",
+    "x": 150,
+    "y": 780,
+    "wires": [
+      [
+        "4ada61fa.b70958"
+      ]
+    ]
+  },
+  {
+    "id": "4ada61fa.b70958",
+    "type": "json",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "property": "payload",
+    "action": "",
+    "pretty": false,
+    "x": 350,
+    "y": 780,
+    "wires": [
+      [
+        "561e282b.87a248"
+      ]
+    ]
+  },
+  {
+    "id": "561e282b.87a248",
+    "type": "function",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "func": "node.log(JSON.stringify(msg.payload));\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 490,
+    "y": 780,
+    "wires": [
+      [
+        "73e6e488.190bbc"
+      ]
+    ]
+  },
+  {
+    "id": "73e6e488.190bbc",
+    "type": "debug",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "false",
+    "x": 670,
+    "y": 780,
+    "wires": []
+  },
+  {
+    "id": "34f811e3.5277c6",
+    "type": "debug",
+    "z": "e0d8c7c9.8b2758",
+    "name": "",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "false",
+    "x": 470,
+    "y": 1040,
     "wires": []
   }
 ]
