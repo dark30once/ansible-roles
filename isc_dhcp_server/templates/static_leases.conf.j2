@@ -1,0 +1,6 @@
+{% for host in dhcpd_static_hosts %}
+host {{host.name}} {
+    hardware ethernet {{host.mac}};
+    fixed-address {{host.ip}};
+}
+{% endfor %}
