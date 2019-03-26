@@ -9,6 +9,16 @@
       create: yes
   when: apt_cache_url is defined
 
+- name: Setup apt cache proxy direct hosts
+  lineinfile:
+      dest: /etc/apt/apt.conf.d/02proxy
+      line: 'Acquire::http::Proxy::{{ item }} DIRECT;'
+      state: present
+      create: yes
+  with_items: "{{ apt_cache_direct_urls }}"
+  when: apt_cache_direct_urls is defined
+
+
 - name: Enable Jessie-Backports
   apt_repository:
       repo: deb http://httpredir.debian.org/debian jessie-backports main

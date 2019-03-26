@@ -1,0 +1,5 @@
+---
+# RedHat/Centos specific tasks
+
+- name: Install RedHat Requirements
+  yum: name="apt-cacher-ng" state=latest 

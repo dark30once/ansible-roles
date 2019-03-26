@@ -1,0 +1,48 @@
+---
+# Tasks to install the ISC dhcp server
+#
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Include OS-specific taks
+  include: "{{ ansible_os_family }}.yml"
+
+- name: Ansible service manager
+  debug: var=ansible_service_mgr
+
+- name: "Setup filesystem"
+  file:
+      path: /var/run/apt-cacher-ng
+      state: directory
+      owner: apt-cacher-ng
+
+- name: allow apt-cacher-ng in iptables public input
+  iptables: 
+      chain: "{{ iptables_input_chain }}"
+      protocol: tcp
+      destination_port: "3142"
+      jump: ACCEPT
+      state: present
+  when: (firewalld_enabled is not defined or not firewalld_enabled or firewalld_enabled=="false") and (ufw_enabled is not defined or not ufw_enabled or ufw_enabled=="false")
+
+- name: allow apt-cacher-ng in firewalld
+  firewalld:
+      port:  3142/tcp
+      permanent: true
+      immediate: true
+      state: enabled
+  when: firewalld_enabled is defined and (firewalld_enabled==true or firewalld_enabled=="true")
+
+- name: allow apt-cacher-ng in ufw
+  ufw:
+      rule: "allow"
+      port: 3142
+      proto: tcp
+      state: enabled
+  when: ufw_enabled is defined and (ufw_enabled==true or ufw_enabled=="true")
+
+- name: "Enable apt-cacher-ng service"
+  service:
+      name: apt-cacher-ng
+      state: restarted
+      enabled: yes
