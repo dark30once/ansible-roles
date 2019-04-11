@@ -14,3 +14,9 @@
       - "@Development tools"
       - zlib-devel
       - openssl-devel
+
+- name: Make symlink to pip3
+  file:
+      src: /usr/bin/pip3.4
+      dest: /usr/bin/pip3
+      state: link

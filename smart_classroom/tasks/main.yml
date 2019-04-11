@@ -1,4 +1,3 @@
----
 # Tasks to install the Smart Classroom software
 #
 - name: Include OS-specific variables
@@ -197,6 +196,18 @@
       mode: 0444
   with_items: "{{ passwords.results }}"
   when: "{{ item.item.smart_classroom }} is defined and {{ item.item.smart_classroom }} and not {{ config_file.stat.exists }}"
+
+- name: "Initialize flask migrate"
+  script: "files/check_migrate.py"
+  args:
+      executable: /home/{{ smartclassroom_user }}/.virtualenvs/smartclassroom/bin/python
+      chdir: /srv/smartclassroom_backend
+
+- name: "Upgrade database"
+  shell: "/home/{{ smartclassroom_user }}/.virtualenvs/smartclassroom/bin/flask db upgrade"
+  args:
+      chdir: /srv/smartclassroom_backend
+  notify: reload circus
 
 - name: "Setup smartclassroom circus config"
   template:
