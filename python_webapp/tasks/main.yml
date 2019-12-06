@@ -8,24 +8,14 @@
   include: "{{ ansible_os_family }}.yml"
 
 - name: Intall python3 packages
-  pip: executable=pip3 name={{ item }} state=present
-  with_items:
-      - virtualenv
-      - virtualenvwrapper
-      - psycopg2
-      - configobj
-      - mysqlclient
-      - py-bcrypt
-
-- name: Intall python packages
   pip: executable=pip name={{ item }} state=present
   with_items:
-      - virtualenv
-      - virtualenvwrapper
-      - psycopg2
-      - configobj
-      - mysqlclient
-      - py-bcrypt
+      - [['virtualenv', 'virtualenvwrapper', 'psycopg2', 'configobj', 'mysqlclient', 'py-bcrypt']]
+
+- name: Intall python packages
+  pip: executable=pip name={{ item }} state=forcereinstall
+  with_items:
+      - [['virtualenv', 'virtualenvwrapper', 'psycopg2', 'configobj', 'mysqlclient', 'py-bcrypt']]
 
 - name: set SELinux bool httpd_can_network_connect
   seboolean:
@@ -39,13 +29,13 @@
   when: python_run_circus
 
 - name: Install gunicorn python packages
-  pip: executable=pip3 name={{ item }} state=present
+  pip: executable=pip name={{ item }} state=present
   with_items:
-      - gunicorn
+      - [['gunicorn']]
   when: python_run_gunicorn
 
 - name: Install supervisor python packages
   pip: executable=pip name={{ item }} state=present
   with_items:
-      - supervisor
+      - [['supervisor']]
   when: python_run_supervisor

@@ -4,7 +4,7 @@
 - name: Include OS-specific variables
   include_vars: "{{ ansible_os_family }}.yml"
 
-- name: Include OS-specific taks
+- name: Include OS-specific task
   include: "{{ ansible_os_family }}.yml"
 
 - name: Ansible service manager

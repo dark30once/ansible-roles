@@ -10,16 +10,7 @@
 - name: Install nginx Jessie
   apt: name={{ item }} state=latest default_release=jessie-backports force=yes
   with_items:
-      - nginx-full
-      - python-pkg-resources
-      - python-setuptools
-      - python-cryptography
-      - python-openssl
-      - python-psutil
-      - python-acme
-      - python-certbot
-      - python-certbot-nginx
-      - certbot
+      - [['nginx-full', 'python-pkg-resources', 'python-setuptools', 'python-cryptography', 'python-openssl', 'python-psutil', 'python-acme', 'python-certbot', 'python-certbot-nginx', 'certbot']]
   when: ansible_distribution_release == "jessie"
 
 - name: Add ppa for certbot
@@ -31,29 +22,11 @@
 - name: Install nginx Ubuntu
   apt: name={{ item }} state=latest
   with_items:
-      - nginx-full
-      - python-pkg-resources
-      - python-setuptools
-      - python-cryptography
-      - python-psutil
-      - python-openssl
-      - python-acme
-      - python3-certbot
-      - python3-certbot-nginx
-      - certbot
+      - [['nginx-full', 'python-pkg-resources', 'python-setuptools', 'python-cryptography', 'python-psutil', 'python-openssl', 'python-acme', 'python3-certbot', 'python3-certbot-nginx', 'certbot']]
   when: ansible_distribution == "Ubuntu"
 
 - name: Install nginx rest Debian
   apt: name={{ item }} state=latest
   with_items:
-      - nginx-full
-      - python-pkg-resources
-      - python-setuptools
-      - python-cryptography
-      - python-psutil
-      - python-openssl
-      - python-acme
-      - python-certbot
-      - python-certbot-nginx
-      - certbot
+      - [['nginx-full', 'python-pkg-resources', 'python-setuptools', 'python-cryptography', 'python-psutil', 'python-openssl', 'python-acme', 'python-certbot', 'python-certbot-nginx', 'certbot']]
   when: ansible_distribution_release != "jessie" and ansible_distribution != "Ubuntu"

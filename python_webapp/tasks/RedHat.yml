@@ -4,19 +4,11 @@
 - name: Install required RedHat packages
   yum: name={{ item }} state=present update_cache=yes
   with_items:
-      - python2-pip
-      - python-devel
-      - python34
-      - python34-pip
-      - python34-devel
-      - postgresql-devel
-      - MariaDB-devel
-      - "@Development tools"
-      - zlib-devel
-      - openssl-devel
+      - [['python2-pip', 'python-devel', 'python34', 'python34-pip', 'python34-devel', 'postgresql-devel', 'MariaDB-devel', '@Development tools', 'zlib-devel', 'openssl-devel']]
 
-- name: Make symlink to pip3
+- name: Make symlink to pip
   file:
       src: /usr/bin/pip3.4
-      dest: /usr/bin/pip3
+      dest: /usr/bin/pip
       state: link
+      force: yes

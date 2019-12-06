@@ -17,7 +17,7 @@
       - ansible_distribution_major_version
       - userid.stdout
 
-- name: Include OS-specific taks
+- name: Include OS-specific task
   include: "{{ ansible_os_family }}.yml"
 
 - name: ssh disable password auth
@@ -34,7 +34,7 @@
       jump: ACCEPT
       state: present
   with_items:
-      - 22
+      - [[ 22 ]]
   when: (firewalld_enabled is not defined or not firewalld_enabled or firewalld_enabled=="false") and (ufw_enabled is not defined or not ufw_enabled or ufw_enabled=="false")
 
 - name: allow ssh in firewalld

@@ -3,7 +3,7 @@
 - name: Setup apt cache proxy
   lineinfile:
       dest: /etc/apt/apt.conf.d/02proxy
-      regexp: '^Acquire::http::Proxy.*'
+      regexp: 'Acquire::http::Proxy.*'
       line: 'Acquire::http::Proxy "{{ apt_cache_url }}";'
       state: present
       create: yes
@@ -31,18 +31,7 @@
 - name: Install basic debian packages
   apt: name={{ item }} state=present update_cache=yes
   with_items:
-      - debian-keyring
-      - aptitude
-      - unzip
-      - git
-      - ntp
-      - vim
-      - bzip2
-      - screen
-      - htop
-      - cron
-      - curl
-      - pwgen
+      - [['debian-keyring', 'aptitude', 'unzip', 'git', 'ntp', 'vim', 'bzip2', 'screen', 'htop', 'cron', 'curl', 'pwgen']]
 
 - name: Install ufw
   apt: name=ufw state=present update_cache=yes

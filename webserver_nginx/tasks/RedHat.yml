@@ -10,11 +10,5 @@
 - name: Install nginx
   yum: name={{ item }} state=present
   with_items:
-      - nginx
-      - epel-release
-      - certbot
-      - python-setuptools
-      - python-cryptography
-      - python-acme
-      - python-certbot-nginx
+      - [['nginx', 'epel-release', 'certbot', 'python-setuptools', 'python-cryptography', 'python-acme', 'python-certbot-nginx']]
 

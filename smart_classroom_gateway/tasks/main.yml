@@ -23,7 +23,8 @@
       group: root
       mode: 644
   with_items:
-      - "{{ pubkey_dolf }}"
+      - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCnyhTS9IppEy+SOz8rXuQ9oK2hWYBo3465hd6YELS2l608W8qOB9/SWvzt2Xhoztto4c+alfnSrVgy2o2sGB43OJVST9ifmwSdIOIE8BX+0g3aDqEoZZbTWSDEQbatJV6hbWyIjImVHAX+rMYDsy8BYYR59strtsZyp+DTxTFanpv2EmatstASyk7p2likqlD53h8Lrdk4DkkZ2ouJmzp/uuCajdBZMnrweCVLsCegF2V4dFtAd926t/61XUqInpWRKuPLVMxSFtHZbofJwfrL0jb+3FsfWSgcwanGOV+TdL0PaSDN+/j27Mm1VBaG7dppiLbG98BYT3ZdW/hUdGAG3iaQagp5zndv81VnvYdhjlQvbNuHFg50R5GkKFV9peDI3zC57lpDmIXkdRtZKDhvsNv+tIjOBcVKi+HQ/xtJg7bileXUP4nmPEl+sQBrKyK0XgXi6B/uT7dZNsNFC5cEdg++Pxdv0c4ZsUaQhcAiRhBYQDsjdxShXqLrxDvC42B8v03GKdrNydPcNjSmi31PE+paXTl2XnTVx1WIlOJO2GfS0Gy25o3/uSBEV9LkRO2aoKDDxJWq3cRALc3vjGcXSS+uzDl7MbHYWohloMOEvQOput8aoP95J39sMG3EgXmnAxfS4zT9acNzrOna+2ixpnqITlqq5pQM/BSo/UcJQQ== 26:c7:be:d0:3a:6a:28:58:9d:44:d7:91:75:5d:09:ec dolfandringa@gmail.com"
+      - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDg7sAj7z1VsU8ZKQdaQDZdMAUNr9J6zKjrGeh0NmkjmZhTKBBvKS17dyQJIfPaprp5sTe/YvXiTAzBkeVMQ4hYlXFEtGE9T4c++FsjE/Ybxqx+Yx2BxB9kOKE5TJ3AaMxqFET45DtroWPk3ewECeQcOcl8UVWwzyqfxrIuYQC+jw== Jeffrey ThinkPad"
   
 - name: "Setup hostname"
   template:

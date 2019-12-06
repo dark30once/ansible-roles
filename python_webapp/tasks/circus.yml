@@ -1,9 +1,9 @@
 
 
 - name: Install circus python packages
-  pip: executable=pip3 name={{ item }} state=present
+  pip: executable=pip name={{ item }} state=present
   with_items:
-      - circus
+      - [['circus']]
 
 - name: setup circus path for conf file
   file: path={{ item.path }} owner='root' group='root' mode=0755 state=directory

@@ -10,7 +10,7 @@
   yum_repository: name="{{ item.name }}" description="{{ item.description }}" baseurl="{{ item.url }}" state="{{ item.state }}"
   with_items:
       - name: foundationu
-        description: Foundation University mirro
+        description: Foundation University mirror
         url: http://mirror.itops.foundationu.com/centos/7/os/x86_64/
         state: absent
       - name: epel
@@ -22,8 +22,7 @@
 - name: install selinux software
   yum: name="{{ item }}" state=present
   with_items:
-      - setroubleshoot-server
-      - policycoreutils-python
+      - [['setroubleshoot-server', 'policycoreutils-python']]
   when: selinux_host is defined and selinux_host
 
 - name: upgrade all packages
@@ -32,18 +31,7 @@
 - name: Install basic packages
   yum: name="{{ item }}" state=latest
   with_items:
-      - unzip
-      - patch
-      - git
-      - bzip2
-      - ntp
-      - vim
-      - screen
-      - htop
-      - curl
-      - pwgen
-      - firewalld
-      - python-firewall
+      - [['unzip', 'patch', 'git', 'bzip2', 'ntp', 'vim', 'screen', 'htop', 'curl', 'pwgen', 'firewalld', 'python-firewall']]
 
 - name: allow ssh in firewalld
   firewalld:
